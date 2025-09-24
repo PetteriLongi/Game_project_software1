@@ -34,7 +34,7 @@ def get_connection():
             user="gameuser",
             password="yourpassword",  # <-- replace with your real password
             host="localhost",
-            database="conduit_game",
+            database="flight_game",
             port=3306,
         )
         return conn
@@ -51,7 +51,7 @@ def fetch_hel() -> Tuple[int, str, str, str, Optional[float], Optional[float]]:
     cur = conn.cursor()
     cur.execute("""
         SELECT id, name, iata_code, iso_country, latitude_deg, longitude_deg
-        FROM airports
+        FROM airport
         WHERE iata_code = 'HEL'
         LIMIT 1;
     """)
@@ -68,7 +68,7 @@ def fetch_random_airports_excl_hel(n: int = 10) -> List[Tuple[int, str, str, str
     cur = conn.cursor()
     cur.execute(f"""
         SELECT id, name, iata_code, iso_country, latitude_deg, longitude_deg
-        FROM airports
+        FROM airport
         WHERE iata_code <> 'HEL'
         ORDER BY RAND()
         LIMIT {int(n)};
@@ -283,5 +283,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-print("Thank you for playing!")
-print("Thank you for playing!")
+
