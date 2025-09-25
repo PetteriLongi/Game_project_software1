@@ -15,7 +15,7 @@ print("""
 from game import combat, manifestation_library, create_enemy
 from game import weapon_library, consumable_library, add_weapon_to_inventory, add_item_to_inventory
 
-
+print("TEST")
 
 if __name__ == "__main__":
     # Player starts with only Fear unlocked
