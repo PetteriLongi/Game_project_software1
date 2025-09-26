@@ -35,11 +35,11 @@ START_HP = 100                # starting health
 def get_connection():
     try:
         conn = mariadb.connect(
-            user=DB_USER,
-            password=DB_PASS,
-            host=DB_HOST,
-            database=DB_NAME,
-            port=DB_PORT,
+            user="gameuser",
+            password="yourpassword",
+            host="localhost",
+            database="flight_game",
+            port=3306,
         )
         return conn
     except mariadb.Error as e:

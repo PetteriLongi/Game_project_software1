@@ -11,3 +11,8 @@ print("""
 """)
 
 print("HELLO I AM JACK I BIFFED IT AND I SAY BIFFED SINCE IM AUSTRALIAN KANGAROO")
+
+from src.game_db import main
+
+if __name__ == "__main__":
+    main()
