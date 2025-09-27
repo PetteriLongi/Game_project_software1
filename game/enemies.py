@@ -1,6 +1,29 @@
+"""
+enemies.py - Instructions for use in the main game file
+
+1. Import the Enemy class and helper functions:
+       from enemies import Enemy, create_enemy, enemy_library
+
+2. Creating a new enemy instance:
+       # From the enemy library
+       cultist = create_enemy("Cultist")
+       # Or manually
+       custom_enemy = Enemy("Goblin", difficulty=1, hp=15, attack=(2, 5))
+
+3. Accessing predefined enemies:
+       enemy = enemy_library["High Priest"]
+
+4. Handling special attacks:
+       # Special attacks are automatically called within take_turn()
+       # They return messages suitable for the combat log.
+
+5. Tips:
+       - Use create_enemy() when you want a fresh instance with full HP.
+       - Always capture the returned messages from take_turn() and print or log them in your combat loop.
+"""
+
+
 import random
-
-
 # ==========================================
 # Enemy Class
 # ==========================================
@@ -11,74 +34,101 @@ class Enemy:
     Each enemy has a name, difficulty level, health points (HP),
     attack range, optional special attack, and a description.
     """
-    def __init__(self, name, difficulty, hp, attack, special_attack=None, description=""):
+    def __init__(self, name, difficulty, hp, attack, special_attack=None, special_attack_chance=0.3, description="", exp_reward=10):
         self.name = name                    # Enemy's name
         self.difficulty = difficulty        # Difficulty rating (can be used for scaling loot, XP, etc.)
         self.hp = hp                        # Current health
         self.max_hp = hp                    # Maximum health
         self.attack = attack                # Tuple (min_damage, max_damage) for regular attack
         self.special_attack = special_attack  # Optional function for special abilities
+        self.special_attack_chance = special_attack_chance  # configurable per enemy
         self.description = description      # Description for flavor text
+        self.exp_reward = exp_reward  # How much EXP the player gets for defeating this enemy
 
-    def take_turn(self, player):
+    def take_turn(self, player, enemies, defending=False):
         """
         Called when the enemy takes its turn in combat.
         Decides whether to use special attack or normal attack.
+
+        Args:
+            player: the Player instance to target
+            enemies: list of Enemy instances (used by some specials)
+            defending (bool): if True, player has chosen Defend this round
+                              and will take half damage from normal attacks
         """
-        if self.special_attack and random.random() < 0.3:   # 30% chance to use special attack
-            self.special_attack(self, player)
+        messages = []
+
+        # Roll for special attack first (if one is defined for this enemy)
+        if self.special_attack and random.random() < self.special_attack_chance:
+            # Standardized signature: special(enemy, player, enemies)
+            messages += self.special_attack(self, player, enemies)
         else:
-            dmg = random.randint(*self.attack)              # Random damage in the attack range
-            player["hp"] -= dmg
-            print(f"\n{self.name} strikes you for {dmg} damage.!")
+            # Use the basic attack (random damage within the enemy's range)
+            dmg = random.randint(*self.attack)
+            if defending:
+                # If the player chose to defend, reduce damage by half (rounded down)
+                dmg //= 2
+            player.hp -= dmg
+            messages.append(f"{self.name} strikes you for {dmg} damage!")
+
+        messages.append("")
+        return messages
 
 
 # ==========================================
 # Special Attacks for Enemies
 # ==========================================
 
-def apostle_buff(enemy, player):
+def apostle_buff(enemy, player, enemies):
     """
     Special attack for Apostles.
     Heals the enemy a small random amount.
     """
+    messages = []
+    # Find the ally with the lowest HP that’s still alive
+    target = min([e for e in enemies if e.hp > 0], key=lambda e: e.hp)
     heal = random.randint(3, 6)
-    enemy.hp = min(enemy.max_hp, enemy.hp + heal)
-    print(f'\n{enemy.name} chants a hymn, regaining {heal} health')
+    target.hp = min(target.max_hp, target.hp + heal)
+    messages.append(f"{enemy.name} chants a hymn, healing {target.name} for {heal} HP!")
+    return messages
 
-
-def priest_curse(enemy, player):
+def priest_curse(enemy, player, enemies):
     """
     Special attack for High Priests.
     Reduces the player's sanity.
     """
+    messages = []
     dmg = random.randint(4, 8)
-    player["sanity"] = max(0, player["sanity"] - dmg)
-    print(f"\n{enemy.name} invokes a dark curse!")
-    print(f"Your sanity is reduced by {dmg}!")
+    player.sanity = max(0, player.sanity - dmg)
+    messages.append(f"{enemy.name} invokes a dark curse!")
+    messages.append(f"Your sanity is reduced by {dmg}!")
+    return messages
 
 
-def whisperer_psychic(enemy, player):
+def whisperer_psychic(enemy, player, enemies):
     """
     Special attack for Whisperers.
     Deals minor HP and sanity damage.
     """
+    messages = []
     dmg = random.randint(5, 10)
-    player["hp"] -= dmg
-    player["sanity"] = max(0, player["sanity"] - 2)
-    print(f"\n{enemy.name} whispers forbidden truths...")
-    print(f"You take {dmg} psychic damage and lose 2 sanity!")
+    player.hp -= dmg
+    player.sanity = max(0, player.sanity - 2)
+    messages.append(f"{enemy.name} whispers forbidden truths...")
+    messages.append(f"You take {dmg} psychic damage and lose 2 sanity!")
+    return messages
 
 
-def abomination_crush(enemy, player):
+def abomination_crush(enemy, player, enemies):
     """
     Special attack for Abominations.
     Deals high HP damage.
     """
+    messages = []
     dmg = random.randint(8, 14)
-    player["hp"] -= dmg
-    print(f"\n{enemy.name} crushes you with monstrous strength for {dmg} damage!")
-
+    player.hp -= dmg
+    messages.append(f"{enemy.name} crushes you with monstrous strength for {dmg} damage!")
+    return messages
 
 
 # ==========================================
@@ -89,23 +139,25 @@ def abomination_crush(enemy, player):
 # Each entry can be used to spawn a fresh copy of that enemy.
 enemy_library = {
     # Difficulty 1: Cultists
-    "Cultist": Enemy("Cultist", difficulty=1, hp=20, attack=(3, 6), description="Fanatical servant of the cult."),
+    "Cultist": Enemy("Cultist", difficulty=1, hp=20, attack=(3, 6), description="Fanatical servant of the cult.", exp_reward=10),
 
     # Difficulty 2: Apostles
-    "Apostle": Enemy("Apostle", difficulty=2, hp=28, attack=(4, 7), special_attack=apostle_buff,
-                     description="Disciple that heals itself with hymns."),
+    # Apostle: demonstrates an ally-targeting special (heals lowest-HP ally)
+    # special_attack_chance=1 means it will always try to use the special each turn
+    "Apostle": Enemy("Apostle", difficulty=2, hp=28, attack=(4, 7), special_attack=apostle_buff, special_attack_chance=1,
+                      description="Disciple that heals itself with hymns.", exp_reward=20),
 
     # Difficulty 3: High Priests
     "High Priest": Enemy("High Priest", difficulty=3, hp=35, attack=(5, 9), special_attack=priest_curse,
-                         description="Leader who curses your sanity."),
+                         description="Leader who curses your sanity.", exp_reward=30),
 
     # Difficulty 4: Whisperers
     "Whisperer": Enemy("Whisperer", difficulty=4, hp=30, attack=(4, 10), special_attack=whisperer_psychic,
-                       description="Maddening voice that eats away at your mind."),
+                       description="Maddening voice that eats away at your mind.", exp_reward=10),
 
     # Difficulty 5: Abominations
     "Abomination": Enemy("Abomination", difficulty=5, hp=50, attack=(6, 12), special_attack=abomination_crush,
-                         description="Horrific mutation of flesh and shadow."),
+                         description="Horrific mutation of flesh and shadow.", exp_reward=50),
 }
 
 # ==========================================
@@ -123,6 +175,8 @@ def create_enemy(name):
         template.difficulty,
         template.max_hp,  # Reset HP to full
         template.attack,
-        template.special_attack,
-        template.description
+        special_attack = template.special_attack,
+        special_attack_chance= template.special_attack_chance,
+        description = template.description,
+        exp_reward = template.exp_reward
     )

@@ -2,26 +2,30 @@
 # IMPORTS: BRINGING IN OTHER MODULES
 # ==========================================
 
-
-# Import the combat function from the combat module
-# This function contains the main combat loop where the player fights enemies
+# Combat
 from .combat import combat
+from .combat_actions import select_target, resolve_attack, handle_manifestations, handle_inventory, reload_gun
 
+# Player
+from .player import Player
 
-# Import the Manifestation class and the manifestation_library from manifestations module
-# - Manifestation class: used to create new summonable abilities
-# - manifestation_library: dictionary of pre-defined manifestations
+# SFX
+from .music import load_sfx, play_sfx
+
+# Manifestations
 from .manifestations import manifestation_library, Manifestation
 
-
-# Import the enemy_library dictionary and create_enemy function from enemies module
-# - enemy_library: stores templates for all enemies in the game
-# - create_enemy: function to create a fresh enemy instance based on a template
+# Enemies
 from .enemies import enemy_library, create_enemy
 
-# Import item and weapon utilities from items module
-# - weapon_library: stores all available weapons
-# - consumable_library: stores all available consumable items (potions, ammo, etc.)
-# - add_item_to_inventory: function to add consumables to the player's inventory
-# - add_weapon_to_inventory: function to add weapons to the player's inventory
+# Items
 from .items import weapon_library, consumable_library, add_item_to_inventory, add_weapon_to_inventory
+
+# Music
+from .music import play_music, stop_music, set_volume
+
+# UI
+from .ui import render_inventory, draw_status_bars_rich, draw_status_bars_ascii
+
+# Writing Effects
+from .writing_effects import print_typewriter, flicker_line, dim_text, red_flash, print_glitch

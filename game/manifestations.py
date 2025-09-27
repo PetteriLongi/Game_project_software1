@@ -1,3 +1,34 @@
+"""
+manifestations.py - Instructions for use in the main game file
+
+1. Import manifestations:
+       from manifestations import Manifestation, manifestation_library
+
+2. Access a manifestation:
+       fear = manifestation_library["Fear"]
+       rage = manifestation_library["Rage"]
+       despair = manifestation_library["Despair"]
+
+3. Assign manifestations to the player:
+       player["manifestations"] = [fear, rage]  # list of Manifestation objects
+
+4. Using a manifestation in combat:
+       # Choose a target enemy instance (from enemies.py)
+       result_messages = fear.use_skill(player, enemy)
+
+       # result_messages is a list of formatted strings describing the effect
+       # You can display them using:
+       for msg in result_messages:
+           print(msg)
+
+5. Notes:
+       - The player's "sanity" must be >= the manifestation's sanity_cost to use it.
+       - Each manifestation has a description (for menus) and a special_attack function defining its effect.
+       - You can extend the library by adding new Manifestation objects:
+           manifestation_library["NewPower"] = Manifestation("NewPower", sanity_cost=5, special_attack=my_func, description="...")
+
+"""
+
 import random
 
 # ==========================================
@@ -9,11 +40,12 @@ class Manifestation:
     Represents a summonable entity (like a magical or psychic power)
     that the player can use in combat.
     """
-    def __init__(self, name, sanity_cost, special_attack, description):
+    def __init__(self, name, sanity_cost, special_attack, description, target_type="enemy"):
         self.name = name                        # Name of the manifestation
         self.sanity_cost = sanity_cost          # How much sanity (mana) it costs to use
         self.special_attack = special_attack    # Function that runs when used
         self.description = description          # Description shown in menu
+        self.target_type = target_type          # "enemy" (default) or "self"
 
     # Method to use the manifestation's skill in combat
     def use_skill(self, player, enemy):
@@ -21,18 +53,19 @@ class Manifestation:
         Attempts to use the manifestation's special ability in combat.
 
         Args:
-            player: Dictionary representing the player (with HP, sanity, inventory, etc.)
-            enemy: Enemy object to target
+            player: Player instance (game.player.Player) using this manifestation.
+            enemy: Enemy instance to target, or None for self-targeting skills.
 
         Returns:
-            Result of the special attack, or None if not enough sanity
+            List[str] of log messages describing the outcome, or a one-line
+            message indicating insufficient sanity.
         """
-        if player["sanity"] >= self.sanity_cost:                     # Check if player has enough sanity
-            player["sanity"] -= self.sanity_cost                     # Reduce sanity cost
-            return self.special_attack(player, enemy)                # Call its special attack function
+        if player.sanity >= self.sanity_cost:                     # Check if player has enough sanity
+            player.sanity -= self.sanity_cost                     # Reduce sanity cost
+            messages = self.special_attack(player, enemy)
+            return messages                                          # Call its special attack function
         else:
-            print(f"\nNot enough sanity to summon {self.name}'s power!")
-            return None
+            return [f"\033[95mNot enough sanity to summon {self.name}'s power!\033[0m"]
 
 
 # ==========================================
@@ -43,45 +76,64 @@ def fear_special(player, enemy):
     """
     Fear manifestation: Deals strong psychic damage to the enemy.
     """
-    dmg = random.randint(8, 14)         # Damage range for Fear
-    enemy.hp -= dmg                           # Apply damage
-    print(f"\nManifestation of Fear whispers horrors into {enemy.name}!")
-    print(f"It deals {dmg} psychic damage!")
-    return dmg
+    dmg = random.randint(14, 24)         # Damage range for Fear
+    enemy.hp -= dmg                      # Apply damage
+    messages = [
+        f"\033[95mManifestation of Fear whispers horrors into {enemy.name}!\033[0m",
+        f"\033[95mIt deals {dmg} psychic damage!\033[0m"
+    ]
+    return messages
+
+#Hope special attack heals the player
+def hope_special(player, enemy=None):
+    """
+    Hope manifestation: Heals the player.
+    """
+    heal = random.randint(10, 20)
+    player.hp = min(player.max_hp, player.hp + heal)
+    messages = [
+        f"\033[95mManifestation of Hope heals you!\033[0m",
+        f"\033[95mYou recover {heal} HP!\033[0m"
+    ]
+    return messages
 
 #Rages special attack
 def rage_special(player, enemy):
     """
     Rage manifestation: High damage to enemy but player suffers recoil.
     """
-    dmg = random.randint(10, 12)        # Low - High damage
+    dmg = random.randint(20, 42)        # Low - High damage
     enemy.hp -= dmg
-    recoil = 2                                # But player also takes recoil damage
-    player["hp"] -= recoil
-    print(f"\nManifestation of Rage erupts in violent fury!")
-    print(f"It deals {dmg} damage but you suffer {recoil} recoil.")
-    return dmg
+    recoil = random.randint(1, 20)      # Player also takes recoil damage
+    player.hp -= recoil
+    messages = [
+        f"\033[95mManifestation of Rage erupts in violent fury!\033[0m",
+        f"\033[95mIt deals {dmg} damage but you suffer {recoil} recoil.\033[0m"
+    ]
+    return messages
 
 #despairs special attack steals HP from the enemy
-def despair_special(player, enemy):
+def vindication_special(player, enemy):
     """
-    Despair manifestation: Damages enemy and heals the player.
+    Vindication manifestation: Damages enemy and heals the player.
     """
-    dmg = random.randint(4, 8)
+    dmg = random.randint(4, 25)
     enemy.hp -= dmg
-    heal = random.randint(3, 6)
-    player["hp"] = min(player["max_hp"], player["hp"] + heal)
-    print(f"\nManifestation of Despair drains life from {enemy.name}!")
-    print(f"It deals {dmg} damage and heals you for {heal}.")
-    return dmg
+    heal = dmg // 2
+    player.hp = min(player.max_hp, player.hp + heal)
+    messages = [
+        f"\033[95mManifestation of Vindication drains life from {enemy.name}!\033[0m",
+        f"\033[95mIt deals {dmg} damage and heals you for {heal}.\033[0m"
+    ]
+    return messages
 
 # ==========================================
-# MANIFESTATION LIBRARY
 # ==========================================
 
 # This dictionary stores all available manifestations for easy access
 manifestation_library = {
     "Fear": Manifestation("Fear", sanity_cost=5, special_attack=fear_special, description="Strong psychic damage."),
+    "Hope": Manifestation("Hope", sanity_cost=5, special_attack=hope_special, description="Fuels the spirit, revitalizing your body.", target_type="self"),
     "Rage": Manifestation("Rage", sanity_cost=6, special_attack=rage_special, description="High damage but hurts you."),
-    "Despair": Manifestation("Despair", sanity_cost=4, special_attack=despair_special, description="Damage + life steal."),
+    "Vindication": Manifestation("Vindication", sanity_cost=4, special_attack=vindication_special, description="Damage + life steal."),
 }
