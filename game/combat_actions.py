@@ -1,6 +1,7 @@
 import random
 from .items import Weapon, Item, Consumable
 from .ui import render_inventory, colouring
+from .music import play_sfx
 
         # ========================================
         # COMBAT FUNCTIONS
@@ -64,6 +65,14 @@ def reload_gun(player, weapon=None, ammo=None, consume_turn=True):
         msgs.append(colouring("You are not wielding a firearm.", "yellow"))
         msgs.append("")
         return (consume_turn, msgs)
+    
+    match weapon.name:
+        case "Old revolver":
+            play_sfx("revolver_reload")
+        case "AR-15":
+            play_sfx("reload")
+        case "MP7":
+            play_sfx("reload")
 
     needed = max(0, weapon.mag_size - weapon.current_mag)
     if needed == 0:
@@ -107,12 +116,27 @@ def handle_inventory(player):
     weapons_list = []
     consumables_list = []
 
+    # Migrate any lingering ammo-type consumables into the ammo pool
+    # This prevents showing stale ammo quantities as inventory items.
+    to_remove = []
+    for it in list(player.inventory):
+        if isinstance(it, Consumable) and getattr(it, "type", None) and str(getattr(it, "type")).lower() == "ammo":
+                ammo_key = getattr(it, "name", None) or "ammo"
+                qty = getattr(it, "quantity", 0) or 0
+                if qty > 0:
+                    player.ammo[ammo_key] = player.ammo.get(ammo_key, 0) + qty
+                to_remove.append(it)
+    for it in to_remove:
+        player.inventory.remove(it)
+
     for it in player.inventory:
         match it:
             case Weapon():
                 weapons_list.append(it)
             case Consumable():
-                consumables_list.append(it)
+                # Skip ammo-type consumables from being displayed/selected
+                if not (getattr(it, "type", None) and str(getattr(it, "type")).lower() == "ammo"):
+                    consumables_list.append(it)
             case _:
                 consumables_list.append(it)
 
@@ -270,6 +294,19 @@ def resolve_attack(player, target, player_log):
         dmg = random.randint(*player.base_attack)
         weapon_name = "your fists"
     
+    match weapon_name:
+        case "Basic dagger":
+            play_sfx("knife_slash")
+        case "Ulfberht sword":
+            play_sfx("sword_slash")
+        case "Old revolver":
+            play_sfx("revolver_shot")
+        case "AR-15":
+            play_sfx("rifle_shot")
+        case "MP7":
+            play_sfx("submachine_shot")
+
+        
     #apply damage
     target.hp -= dmg
     if dmg > 0:

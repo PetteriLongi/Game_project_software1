@@ -19,6 +19,25 @@ import random
 import shutil
 from game.music import play_sfx
 
+# Detect platform
+try:
+    import msvcrt  # Windows-only
+    def poll_key():
+        if msvcrt.kbhit():
+            return msvcrt.getwch()
+        return None
+    HAS_KB = True
+except ImportError:
+    import termios, tty, select
+
+    def poll_key():
+        """Non-blocking single key read on POSIX (macOS, Linux)."""
+        dr, _, _ = select.select([sys.stdin], [], [], 0)
+        if dr:
+            return sys.stdin.read(1)
+        return None
+    HAS_KB = True
+
 # Optional color support on Windows
 try:
     from colorama import init as colorama_init, Fore, Style
@@ -70,7 +89,10 @@ def print_typewriter(
     sfx_channel=7,
     sfx_channel_2=6,
     sfx_key_name="type_key",
-    sfx_return_name=None
+    sfx_return_name=None,
+    allow_skip=True,
+    skip_line_key=" ",
+    skip_all_key="\r"
 ):
 
     last_click_ts = 0.0
@@ -93,9 +115,25 @@ def print_typewriter(
     punct_set = ".,!?;:"  # extra pause after these
     glitch_chars = "@#$%&*+=/\\|~^"  # pool for brief glitches
 
+    # skip state
+    skip_line = False
+    skip_all = False
+
     for ch in text:
+        # Poll keyboard (non-blocking) to update skip states
+        if allow_skip and HAS_KB:
+            try:
+                k = poll_key()
+                if k == skip_all_key:
+                    skip_all = True
+                    skip_line = False
+                elif k == skip_line_key:
+                    if not skip_all:
+                        skip_line = True
+            except Exception:
+                pass
         # Optional glitch: briefly show wrong char and correct in-place
-        if glitch_probability > 0 and ch not in "\n" and random.random() < glitch_probability:
+        if not skip_all and not skip_line and glitch_probability > 0 and ch not in "\n" and random.random() < glitch_probability:
             wrong = random.choice(glitch_chars)
             sys.stdout.write(wrong)
             sys.stdout.flush()
@@ -118,21 +156,27 @@ def print_typewriter(
         if ch == "\n":
             if sfx and sfx_return_name:
                 play_sfx(sfx_return_name, channel_id=sfx_channel_2)
-            time.sleep(base_delay * 2)
+            if not skip_all:
+                # end of line cancels line fast-forward
+                time.sleep(base_delay * 2)
+            skip_line = False
             continue
         if ch == " ":
-            time.sleep(base_delay * 0.6)
+            if not skip_all and not skip_line:
+                time.sleep(base_delay * 0.6)
             continue
 
-        delay = base_delay + random.uniform(0, jitter)
-        time.sleep(delay)
+        if not skip_all and not skip_line:
+            delay = base_delay + random.uniform(0, jitter)
+            time.sleep(delay)
 
         if ch in punct_set:
             now = time.time()
             if sfx and (now - last_click_ts >= min_click_interval):
                 play_sfx(sfx_key_name, channel_id=sfx_channel)
                 last_click_ts = now
-            time.sleep(punct_pause)
+            if not skip_all and not skip_line:
+                time.sleep(punct_pause)
 
 
 def red_flash(text, flashes=2, on_time=0.06, off_time=0.06):

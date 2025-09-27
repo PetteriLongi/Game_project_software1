@@ -23,6 +23,9 @@ Battle cultists and abominations using melee weapons, firearms with magazines an
 - Python 3.10+
 - pygame
 - Optional: rich (for enhanced terminal UI)
+- RUN THROUGH TERMINAL AND INPUT:python main.py
+- running through Run ruins the visual experience 
+  due to the limitations in the way Run/Debug console handles ANSI and Rich
 
 Install dependencies:
 ```bash

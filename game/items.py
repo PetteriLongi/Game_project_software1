@@ -58,10 +58,14 @@ class Consumable(Item):
     """
     Represents consumable items, like potions or ammo.
     Inherits from Item but adds quantity tracking.
+    If 'type' is provided (e.g., 'ammo'), it will be used for routing logic.
     """
-    def __init__(self, name, description, effect=None, quantity=1):
+    def __init__(self, name, description, effect=None, quantity=1, type=None):
         super().__init__(name, description, effect)
         self.quantity = quantity  # How many of this item the player has
+        # Optional semantic type label, e.g., 'ammo'.
+        # Note: using the parameter name 'type' to match existing library entries.
+        self.type = type
 
     def use(self, player):
         """
@@ -132,24 +136,26 @@ def add_item_to_inventory(player, item_name, amount=1):
     Adds a consumable item to the player's inventory.
     If the item already exists, increases the quantity.
     """
-    if item_name in consumable_library:
-        # Route ammo items directly to ammo pool
-        lower = item_name.lower()
-        if lower in {".36 caliber", "5.56 caliber"}:
-            key = ".36 Caliber" if lower == ".36 caliber" else "5.56 Caliber"
+    # Resolve to canonical library key (case-insensitive)
+    canonical = next((k for k in consumable_library.keys() if k.lower() == item_name.lower()), None)
+    if canonical is not None:
+        base_item = consumable_library[canonical]
+        # Route ANY consumable explicitly marked as ammo into the ammo pool
+        if getattr(base_item, "type", None) and str(getattr(base_item, "type")).lower() == "ammo":
+            # Use the consumable's display name as the canonical ammo key.
+            # This should match Weapon.ammo_type (e.g., "5.56x45mm NATO").
+            key = base_item.name
             player.ammo[key] = player.ammo.get(key, 0) + amount
             print(f"You obtained {amount}x {key}! Ammo pool now has {player.ammo[key]}.")
             return
         # Otherwise, stack consumables in inventory
         for item in player.inventory:
-            match item:
-                case Consumable() if item.name == item_name:
+            if isinstance(item, Consumable) and item.name == canonical:
                     item.quantity += amount
                     print(f"You obtained {amount}x {item.name}! You now have: {item.quantity} of these")
                     return
 
         # Otherwise, create a new item and add it
-        base_item = consumable_library[item_name]
         new_item = Consumable(base_item.name, base_item.description, base_item.effect, quantity=amount)
         player.inventory.append(new_item)
         print(f"You obtained {amount}x {new_item.name}!")
@@ -192,7 +198,7 @@ def restore_sanity(player, amount):
 # Dictionary of all weapons in the game
 weapon_library = {
     "Basic dagger" : Weapon("Basic dagger", "Quick and light, but low damage", attack_range=(7,12), weapon_type='melee'),
-    "Sword" : Weapon("ulfberht sword", "high-quality steel sword from the Viking era", attack_range=(10,20), weapon_type='melee'),
+    "Sword" : Weapon("Ulfberht sword", "high-quality steel sword from the Viking era", attack_range=(10,20), weapon_type='melee'),
     "Jack's hammer" : Weapon("Jack's hammer", "Jack's beloved hammer of destruction", attack_range=(50,999), weapon_type='melee'),
     "Old revolver" : Weapon("Old revolver", "It has seen better days but seems to still be usable", attack_range=(10,16), weapon_type='gun', ammo_type='.36 Caliber', mag_size=6),
     "MP7" : Weapon("MP7", "The MP7 is a German Personal Defense Weapon and submachine gun", attack_range=(10, 20), weapon_type="gun", ammo_type='4.6x30mm', mag_size=20),
@@ -206,9 +212,9 @@ consumable_library = {
     "Large Health Potion": Consumable("Large Health Potion", "This one reminds you of the odd liquid but it seems to be pulsing with power.", effect=lambda player: heal_hp(player, 30), quantity=0),
     "Small Sanity Potion": Consumable("Small coffee", "Small soothing container of coffee, this should calm your mind.", effect=lambda player: restore_sanity(player, 10), quantity=0),
     "Large Sanity Potion": Consumable("Large coffee", "Full thermos container of coffee, this should calm your mind a lot.", effect=lambda player: restore_sanity(player, 20), quantity=0),
-    ".36 Caliber": Consumable(".36 Caliber", "Revolver ammunition.", effect=None, quantity=0),
-    "5.56x45mm NATO": Consumable("5.56x45mm NATO", "Rifle ammunition.", effect=None, quantity=0),
-    "4.6x30mm": Consumable("4.6x30mm", "Submachine gun ammunition.", effect=None, quantity=0),
+    "pistol ammo": Consumable(".36 Caliber", "Revolver ammunition.", effect=None, quantity=0, type="ammo"),
+    "rifle ammo": Consumable("5.56x45mm NATO", "Rifle ammunition.", effect=None, quantity=0, type="ammo"),
+    "submachine ammo": Consumable("4.6x30mm", "Submachine gun ammunition.", effect=None, quantity=0, type="ammo"),
     "Markka": Consumable("Markka", "A markka is a unit of currency in Finland", effect=None, quantity=0),
     "Makkara": Consumable("Makkara", "A makkara is a unit of currency in Finland. Wait what?!?", effect=lambda player: heal_hp(player, 100) + restore_sanity(player, 100), quantity=0),
     # Additional items like antidotes, elixirs, etc., can be added here
