@@ -145,8 +145,3 @@ When he speaks, the air itself seems to recoil.
     combat(player, enemies2)
     pygame.mixer.music.fadeout(2000)
 
-# TODO ideas for the future:
-# - Add a resting system to recover HP/Sanity between battles
-# - Add more guns and ammo types (e.g., shotgun shells)
-# - Balance weapons and add more enemy types
-# - Expand the player progression and story events
