@@ -3,9 +3,9 @@ from .items import Weapon, Item, Consumable
 from .ui import render_inventory, colouring
 from .music import play_sfx
 
-        # ========================================
-        # COMBAT FUNCTIONS
-        # ========================================
+# ========================================
+# COMBAT FUNCTIONS
+# ========================================
 
 # ---Target selection function---
 def select_target(enemies_list, player_log):
@@ -66,13 +66,13 @@ def reload_gun(player, weapon=None, ammo=None, consume_turn=True):
         msgs.append("")
         return (consume_turn, msgs)
     
-    match weapon.name:
-        case "Old revolver":
-            play_sfx("revolver_reload")
-        case "AR-15":
-            play_sfx("reload")
-        case "MP7":
-            play_sfx("reload")
+    sfx = getattr(weapon, "sfx_reload", None)
+    if sfx:
+        try:
+            play_sfx(sfx)
+        except Exception:
+            # Fail silently if audio unavailable
+            pass
 
     needed = max(0, weapon.mag_size - weapon.current_mag)
     if needed == 0:
@@ -293,19 +293,15 @@ def resolve_attack(player, target, player_log):
         # No weapon, fists
         dmg = random.randint(*player.base_attack)
         weapon_name = "your fists"
-    
-    match weapon_name:
-        case "Basic dagger":
-            play_sfx("knife_slash")
-        case "Ulfberht sword":
-            play_sfx("sword_slash")
-        case "Old revolver":
-            play_sfx("revolver_shot")
-        case "AR-15":
-            play_sfx("rifle_shot")
-        case "MP7":
-            play_sfx("submachine_shot")
-
+  
+    if dmg > 0 and getattr(player, "weapon", None):
+        sfx = getattr(player.weapon, "sfx_attack", None)
+        if sfx:
+            try:
+                play_sfx(sfx)
+            except Exception:
+                # Fail silently if audio unavailable
+                pass
         
     #apply damage
     target.hp -= dmg

@@ -81,6 +81,11 @@ def combat(player, enemies_list):
             # Delegate ASCII status bar rendering to UI module
             draw_status_bars_ascii(player, enemies_list)
 
+        # At the start of a turn, remove defeated enemies.
+        # This ensures summoners (like Dirge) cannot immediately re-summon in
+        # the same round a minion was killed.
+        enemies_list[:] = [e for e in enemies_list if e.hp > 0]
+
         # --- Action menu ---
         # Type the number and press Enter to perform an action
         print("\nChoose your action:")

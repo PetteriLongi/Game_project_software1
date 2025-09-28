@@ -10,6 +10,12 @@ Provides helpers to render nicer inventory and headers.
 # ==========================================
 # IMPORTS
 # ==========================================
+
+# Non optional imports
+import random
+from .music import play_sfx
+import pygame
+import time
 # Detect Rich availability safely here
 try:
     from rich.console import Console
@@ -19,7 +25,9 @@ try:
     from rich.text import Text
     from rich.align import Align
     from rich import box
-    console = Console()
+    from rich.console import Console
+    console = Console(force_terminal=True)
+    
     RICH_AVAILABLE = True
 except Exception:
     # Rich not available. Functions that require Rich should only be called when
@@ -33,88 +41,197 @@ except Exception:
     console = None
     RICH_AVAILABLE = False
 
-import random
+def level_up_display(player):
+    """Level up the player and render a Rich panel (or ASCII fallback) showing gains."""
+    # Snapshot pre-level stats to compute deltas
+    prev_level = getattr(player, "level", 1)
+    prev_hp_max = getattr(player, "max_hp", 0)
+    prev_sanity_max = getattr(player, "max_sanity", 0)
+    prev_attack = getattr(player, "base_attack", (0, 0))
+
+    # Perform the actual level-up
+    player.level_up()
+
+    # Compute gains
+    hp_gain = player.max_hp - prev_hp_max
+    sanity_gain = player.max_sanity - prev_sanity_max
+    # Show the min-end increase; both ends increase equally in current logic
+    attack_gain = player.base_attack[0] - prev_attack[0]
+
+    flavor_text = [
+        "You hear whispers in a language you don’t know… yet.",
+        "A tingling sensation crawls up your spine.",
+        "The veil between worlds thins — and you step through.",
+        "Something unseen has taken interest in your growth.",
+        "The silence now feels… expectant.",  
+    ]
+    flavor = random.choice(flavor_text)
+
+    if RICH_AVAILABLE and console is not None:
+
+        level_text = Text.assemble(
+            Text("🔺 ASCENSION COMPLETE 🔺\n", style="bold magenta"),
+            Text(f"\nYou have reached Level {player.level}!\n", style="bold green"),
+            Text(f"\n+{hp_gain} Maximum HP", style="green"),
+            Text(f"\n+{sanity_gain} Maximum Sanity", style="cyan"),
+            Text(f"\n+{attack_gain} Attack", style="red"),
+            Text(f"\n\n{flavor}", style="italic dim"),
+        )
+        panel_level_up = Panel.fit(
+            level_text,
+            title="Level Up!",
+            title_align="left",
+            box=box.DOUBLE,
+            border_style="magenta",
+            padding=(1, 4),
+        )
+        console.print(panel_level_up)
+        pygame.mixer.music.pause()
+        play_sfx("level_up")
+        time.sleep(4)
+        pygame.mixer.music.unpause()
+        console.print(Text("Press Enter to continue...", style="bold magenta"))
+        console.input("")
+    else:
+        # ASCII fallback
+        print("\n=== LEVEL UP ===")
+        print(f"Now level {player.level}")
+        print(f"+{hp_gain} Max HP, +{sanity_gain} Max Sanity, +{attack_gain} Attack")
+        input("Press Enter to continue...")
+        
 # ==========================================
 # INVENTORY RENDERING
 # ==========================================
 def render_inventory(player, weapons_list, consumables_list):
-    """Render the player's inventory using Rich tables.
+    """Render the player's inventory.
 
+    If Rich is available, use the Rich UI; otherwise, fall back to ASCII output.
     The ordering of items is: weapons first, then consumables.
-    Indices are assigned starting from 1, matching selection order in combat.py.
+    Indices are assigned starting from 1, matching selection order in combat_actions.handle_inventory().
     """
-    # Build ammo reserves line
-    if getattr(player, "ammo", None):
-        ammo_str = "\n".join(f"{k}: {v}" for k, v in player.ammo.items())
-    else:
-        ammo_str = "(none)"
+    if RICH_AVAILABLE:
+        # Build ammo reserves line
+        if getattr(player, "ammo", None):
+            ammo_str = "\n".join(f"{k}: {v}" for k, v in player.ammo.items())
+        else:
+            ammo_str = "(none)"
 
-    # Unified Table
-    items_table = Table(
-        box=box.SIMPLE_HEAVY,
-        expand=True,
-        show_edge=True,
-        header_style="bold magenta",
-        border_style="white",
-    )
-    items_table.add_column("#", justify="right", style="cyan", no_wrap=True)
-    items_table.add_column("Name", style="bold white")
-    items_table.add_column("Mag", justify="right", style="yellow", no_wrap=True)
-    items_table.add_column("Qty", justify="right", style="yellow", no_wrap=True)
-    items_table.add_column("Description", style="dim")
+        # Unified Table
+        items_table = Table(
+            box=box.SIMPLE_HEAVY,
+            expand=True,
+            show_edge=True,
+            header_style="bold magenta",
+            border_style="white",
+        )
+        items_table.add_column("#", justify="right", style="cyan", no_wrap=True)
+        items_table.add_column("Name", style="bold white")
+        items_table.add_column("Mag", justify="right", style="yellow", no_wrap=True)
+        items_table.add_column("Qty", justify="right", style="yellow", no_wrap=True)
+        items_table.add_column("Description", style="dim")
+
+        index = 1
+
+        # Weapons
+        items_table.add_row("[bold magenta]Weapons[/]", "", "", "",  style="bold magenta")
+        for w in weapons_list:
+            equipped = player.weapon is w
+            name_text = Text(w.name, style="bold white")
+            if equipped:
+                name_text.append(" (equipped)", style="green")
+
+            mag = f"[{w.current_mag}/{w.mag_size}]" if getattr(w, "weapon_type", "melee") == "gun" else "-"
+            qty = "-"
+            items_table.add_row(str(index), name_text, mag, qty, w.description)
+            index += 1
+        
+        items_table.add_row("", "", "", "", "")
+
+        # Consumables
+        items_table.add_row("[bold magenta]Consumables[/]", "", "", "", style="bold magenta")
+        for c in consumables_list:
+            mag = "-"
+            qty = getattr(c, "quantity", None)
+            qty_str = str(qty) if isinstance(qty, int) else "-"
+            items_table.add_row(str(index), c.name, mag, qty_str, c.description)
+            index += 1
+
+        # Panel with header and ammo reserves
+        panel_inventory = Panel.fit(
+            Text.assemble(Text("Inventory", style="bold magenta"), "\n", Text(f"Ammo reserves\n{ammo_str}", style="cyan")),
+            box=box.SQUARE,
+            border_style="magenta"
+        )
+
+        # Panel levels
+        panel_level = Panel.fit(
+            Text.assemble(Text("Level", style="bold magenta"), "\n", Text(f"{player.level}", style="cyan")),
+            box=box.SQUARE,
+            border_style="magenta"
+        )
+
+        console.print(Columns([panel_inventory, panel_level], equal=True))
+        console.print()  # spacer
+
+        # Print the unified table 
+        console.print(items_table)
+        console.print(Text("0. Back to action menu", style="bold cyan"))
+    else:
+        _render_inventory_ascii(player, weapons_list, consumables_list)
+
+
+# ==========================================
+# INVENTORY RENDERING (ASCII FALLBACK)
+# ==========================================
+def _render_inventory_ascii(player, weapons_list, consumables_list):
+    """Plain-text inventory rendering used when Rich is unavailable.
+
+    Matches ordering and numbering expected by combat_actions.handle_inventory().
+    """
+    print("\n=== Inventory ===")
+
+    # Ammo reserves
+    print("Ammo reserves:")
+    if getattr(player, "ammo", None):
+        for k, v in player.ammo.items():
+            print(f"  - {k}: {v}")
+    else:
+        print("  (none)")
 
     index = 1
+    # Weapons section
+    print("\nWeapons:")
+    if weapons_list:
+        for w in weapons_list:
+            equipped = (player.weapon is w)
+            badge = " (equipped)" if equipped else ""
+            if getattr(w, "weapon_type", "melee") == "gun":
+                mag = f" [{w.current_mag}/{w.mag_size}]"
+            else:
+                mag = ""
+            print(f"  {index}. {w.name}{badge}{mag} - {w.description}")
+            index += 1
+    else:
+        print("  (none)")
 
-    # Weapons
-    items_table.add_row("[bold magenta]Weapons[/]", "", "", "",  style="bold magenta")
-    for w in weapons_list:
-        equipped = player.weapon is w
-        name_text = Text(w.name, style="bold white")
-        if equipped:
-            name_text.append(" (equipped)", style="green")
+    # Consumables section
+    print("\nConsumables:")
+    if consumables_list:
+        for c in consumables_list:
+            qty = getattr(c, "quantity", None)
+            qty_str = f" x{qty}" if isinstance(qty, int) else ""
+            print(f"  {index}. {getattr(c, 'name', str(c))}{qty_str} - {getattr(c, 'description', '')}")
+            index += 1
+    else:
+        print("  (none)")
 
-        mag = f"[{w.current_mag}/{w.mag_size}]" if getattr(w, "weapon_type", "melee") == "gun" else "-"
-        qty = "-"
-        items_table.add_row(str(index), name_text, mag, qty, w.description)
-        index += 1
-    
-    items_table.add_row("", "", "", "", "")
-
-    # Consumables
-    items_table.add_row("[bold magenta]Consumables[/]", "", "", "", style="bold magenta")
-    for c in consumables_list:
-        mag = "-"
-        qty = getattr(c, "quantity", None)
-        qty_str = str(qty) if isinstance(qty, int) else "-"
-        items_table.add_row(str(index), c.name, mag, qty_str, c.description)
-        index += 1
-
-    # Panel with header and ammo reserves
-    panel_inventory = Panel.fit(
-        Text.assemble(Text("Inventory", style="bold magenta"), "\n", Text(f"Ammo reserves\n{ammo_str}", style="cyan")),
-        box=box.SQUARE,
-        border_style="magenta"
-    )
-
-    # Panel levels
-    panel_level = Panel.fit(
-        Text.assemble(Text("Level", style="bold magenta"), "\n", Text(f"{player.level}", style="cyan")),
-        box=box.SQUARE,
-        border_style="magenta"
-    )
-
-    console.print(Columns([panel_inventory, panel_level], equal=True))
-    console.print()  # spacer
-
-    # Print the unified table 
-    console.print(items_table)
-    console.print(Text("0. Back to action menu", style="bold cyan"))
-    console.print(Text("Choose an item to equip/use (0 to back):", style="cyan"))
+    print("\n0. Back to action menu")
+    print("Choose an item to equip/use (0 to back):")
 
 
-        # ========================================
-        # COLOUR HANDLING
-        # ========================================
+# ========================================
+# COLOUR HANDLING
+# ========================================
 
 COLOURS = {
     "red": "\033[91m",
@@ -131,6 +248,17 @@ COLOURS = {
 def colouring(text, colour):
     return f"{COLOURS[colour]}{text}{COLOURS['reset']}"
 
+def ui_print(text: str, colour: str | None = None):
+    if RICH_AVAILABLE and console is not None:
+        if colour:
+            console.print(Text(str(text), style=colour))
+        else:
+            console.print(str(text))
+    else:
+        if colour:
+            print(colouring(str(text, colour)))
+        else:
+            print(str(text))
 
 # ==========================================
 # COMBAT STATUS BARS (RICH)

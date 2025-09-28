@@ -25,7 +25,10 @@ from .items import weapon_library, consumable_library, add_item_to_inventory, ad
 from .music import play_music, stop_music, set_volume
 
 # UI
-from .ui import render_inventory, draw_status_bars_rich, draw_status_bars_ascii
+from .ui import render_inventory, draw_status_bars_rich, draw_status_bars_ascii, ui_print
 
 # Writing Effects
 from .writing_effects import print_typewriter, flicker_line, dim_text, red_flash, print_glitch
+
+# SFX Loader
+from .sfx_loader import load_sfx

@@ -22,8 +22,6 @@ print("""
 """)
 
 import shutil
-from textwrap import dedent, fill
-
 import pygame
 
 # ==========================================
@@ -35,24 +33,15 @@ from game import (
     manifestation_library,
     create_enemy,
     add_weapon_to_inventory, add_item_to_inventory,
-    play_music, stop_music, set_volume, load_sfx, play_sfx,
-    print_typewriter, flicker_line, dim_text,
+    play_music,
+    print_typewriter,
+    ui_print,
 )
-from rich.console import Console
-console = Console(force_terminal=True)
-
-#reserving channels for SFX
-load_sfx("type_key", "Music/SFX/type_key.wav", volume=0.12, channel_id=7)
-load_sfx("type_return", "Music/ambience/Piano_suspence.mp3", volume=0.12, channel_id=6)
-load_sfx("revolver_reload", "Music/SFX/revolver_reload.wav", volume=0.12, channel_id=5)
-load_sfx("reload", "Music/SFX/reload.wav", volume=0.12, channel_id=5)
-load_sfx("knife_slash", "Music/SFX/knife_slash.wav", volume=0.12, channel_id=5)
-load_sfx("sword_slash", "Music/SFX/sword_slash.wav", volume=0.75, channel_id=5)
-load_sfx("revolver_shot", "Music/SFX/revolver_shot.wav", volume=0.08, channel_id=5)
-load_sfx("rifle_shot", "Music/SFX/rifle_shot.wav", volume=0.12, channel_id=5)
-load_sfx("submachine_shot", "Music/SFX/submachine_shot.wav", volume=0.12, channel_id=5)
-
-
+# UI capability flag (for hinting Rich availability to the user)
+from game.ui import RICH_AVAILABLE
+# Getting all the sound files from sfx_loader and registering them
+from game.sfx_loader import register_all_sfx
+register_all_sfx()
 
 if __name__ == "__main__":
     # ==========================================
@@ -67,23 +56,16 @@ if __name__ == "__main__":
     term_width = shutil.get_terminal_size(fallback=(80, 20)).columns
     wrap_width = max(50, min(100, term_width))
 
-    # NOTE: Below is an old dictionary-style player example we kept for reference.
-    # We now use the Player class above, which is cleaner and easier to extend.
-#    player = {
-#        "hp": 35,           # Current health
-#        "max_hp": 65,       # Max health
-#        "sanity": 15,       # Current sanity (mana)
-#        "max_sanity": 15,   # Max sanity
-#        "attack": (4, 8),   # Physical attack range (min, max)
-#        "Weapon": None,
-#        "inventory": [],
-#        "manifestations": unlocked_manifestations   # List of unlocked manifestations
-#    }
+    # Hint Rich availability (so users understand UI mode)
+    if not RICH_AVAILABLE:
+        print("\nNote: Rich not detected. Using ASCII UI. Install 'rich' for enhanced inventory and status visuals.")
+    else:
+        print("\nRich UI enabled. Enjoy enhanced inventory and status visuals.")
 
     # ==========================================
     # NARRATIVE INTRO (OPTIONAL)
     # ==========================================
-    play_music("Music/ambience/Piano_suspence.mp3", volume=0.12, loop=True)
+    play_music("Music/ambience/Piano_suspense.mp3", volume=0.12, loop=True)
 
     print_typewriter("""The journey leaves you hollow.
 Another airport.
@@ -113,9 +95,6 @@ How did you breach the veil?"
 """,
         mode="calm", sfx=True, sfx_channel=7, sfx_channel_2=6, sfx_key_name="type_key")
 
-
-
-
     # ==========================================
     # STARTING GEAR (FEEL FREE TO TWEAK)
     # ==========================================
@@ -135,16 +114,16 @@ How did you breach the veil?"
     add_weapon_to_inventory(player, "MP7", current_mag=14)
 
     # Pause so the player can read the setup text above (optional)
-    pygame.mixer.music.fadeout(2000)
+    #pygame.mixer.music.fadeout(2000) #this causes a 2, second delay before the combat starts
     input("\nPress enter to continue...")
    
     # ==========================================
     # ENCOUNTER 1
     # ==========================================
     # Prepare the first combat encounter (you can add up to 3 enemies in this list)
-    enemies1 = [create_enemy("Abomination")]
+    enemies1 = [create_enemy("Anatomist")]
     # Start combat with background music for atmosphere
-    play_music("music/combat/Anxiety.mp3", volume=0.12)
+    play_music("Music/combat/Anxiety.mp3", volume=0.12)
     combat(player, enemies1)
     # Fade out the music a bit after combat ends
     pygame.mixer.music.fadeout(2000)
@@ -156,14 +135,14 @@ How did you breach the veil?"
     # Second encounter setup
     print("\nIt seems you have found something")
     add_weapon_to_inventory(player, "Old revolver")  # Comes with a full magazine
-    print('oh no there are even more guys')
+    ui_print('oh no there are even more guys', 'red')
 
     reload_gun(player, consume_turn=False) # A way to reload equipped gun outside of combat by calling this function
 
     input("\nPress enter to continue...")
 
     enemies2 = [create_enemy('Apostle'), create_enemy('High Priest'), create_enemy('Cultist')]
-    play_music("music/combat/Behind_you.mp3", volume=0.12)
+    play_music("Music/combat/Behind_you.mp3", volume=0.12)
     combat(player, enemies2)
     pygame.mixer.music.fadeout(2000)
 

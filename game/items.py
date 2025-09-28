@@ -16,6 +16,9 @@ items.py - Instructions for use in the main game file
 
 4. All item effects return strings suitable for printing to the combat log.
 """
+# Import audio helper for item SFX
+from .music import play_sfx
+from .ui import ui_print
 
 # ==========================================
 # Classes for Items, Weapons, and Consumables
@@ -45,7 +48,7 @@ class Weapon(Item):
     """
     Represents a weapon. Inherits from Item because weapons are also items.
     """
-    def __init__(self, name, description, attack_range, weapon_type='melee', ammo_type=None, mag_size=0):
+    def __init__(self, name, description, attack_range, weapon_type='melee', ammo_type=None, mag_size=0, sfx_attack=None, sfx_reload=None):
         super().__init__(name, description)  # Initialize Item attributes
         self.attack_range = attack_range     # Tuple (min_attack, max_attack) for damage
         self.weapon_type = weapon_type       # 'melee' or 'gun'
@@ -53,6 +56,9 @@ class Weapon(Item):
         self.ammo_type = ammo_type           # e.g., 'bullets', 'rifle'
         self.mag_size = mag_size             # magazine capacity
         self.current_mag = mag_size if weapon_type == 'gun' else 0  # start loaded for guns
+        # Optional SFX key to play on attack (loaded in main.py)
+        self.sfx_attack = sfx_attack
+        self.sfx_reload = sfx_reload
 
 class Consumable(Item):
     """
@@ -60,12 +66,14 @@ class Consumable(Item):
     Inherits from Item but adds quantity tracking.
     If 'type' is provided (e.g., 'ammo'), it will be used for routing logic.
     """
-    def __init__(self, name, description, effect=None, quantity=1, type=None):
+    def __init__(self, name, description, effect=None, quantity=1, type=None, sfx_name=None):
         super().__init__(name, description, effect)
         self.quantity = quantity  # How many of this item the player has
         # Optional semantic type label, e.g., 'ammo'.
         # Note: using the parameter name 'type' to match existing library entries.
         self.type = type
+        # Optional sound effect to play when this consumable is used (loaded via main)
+        self.sfx_name = sfx_name
 
     def use(self, player):
         """
@@ -74,11 +82,16 @@ class Consumable(Item):
         """
         if self.quantity > 0:
             self.quantity -= 1
+            # Play item-specific SFX if configured
+            if getattr(self, "sfx_name", None):
+                try:
+                    play_sfx(self.sfx_name)
+                except Exception:
+                    # Fail silently if audio unavailable
+                    pass
             msg = ""
-            if self.effect: 
+            if self.effect:
                 msg = self.effect(player)   # Call the effect function
-
-
             return msg
         else:
             return f"\033[91mYou have no {self.name} left!\033[0m"
@@ -110,7 +123,9 @@ def add_weapon_to_inventory(player, weapon_name, current_mag=None):
             template.attack_range,
             template.weapon_type,
             getattr(template, 'ammo_type', None),
-            getattr(template, 'mag_size', 0)
+            getattr(template, 'mag_size', 0),
+            getattr(template, 'sfx_attack', None),
+            getattr(template, 'sfx_reload', None),
         )
 
         if getattr(new_weapon, 'weapon_type', 'melee') == 'gun':
@@ -126,9 +141,9 @@ def add_weapon_to_inventory(player, weapon_name, current_mag=None):
             new_weapon.current_mag = 0
             
         player.inventory.append(new_weapon)
-        print(f"\nYou obtained a new weapon: {new_weapon.name}!")
+        ui_print(f"\nYou obtained a new weapon: {new_weapon.name}!", "cyan")
     else:
-        print(f"Weapon '{weapon_name}' does not exist in the library.")
+        ui_print(f"Weapon '{weapon_name}' does not exist in the library.", "red")
 
 
 def add_item_to_inventory(player, item_name, amount=1):
@@ -146,21 +161,27 @@ def add_item_to_inventory(player, item_name, amount=1):
             # This should match Weapon.ammo_type (e.g., "5.56x45mm NATO").
             key = base_item.name
             player.ammo[key] = player.ammo.get(key, 0) + amount
-            print(f"You obtained {amount}x {key}! Ammo pool now has {player.ammo[key]}.")
+            ui_print(f"You obtained {amount}x {key}! Ammo pool now has {player.ammo[key]}.", "yellow")
             return
         # Otherwise, stack consumables in inventory
         for item in player.inventory:
-            if isinstance(item, Consumable) and item.name == canonical:
+            if isinstance(item, Consumable) and item.name == base_item.name:
                     item.quantity += amount
-                    print(f"You obtained {amount}x {item.name}! You now have: {item.quantity} of these")
+                    ui_print(f"You obtained {amount}x {item.name}! You now have: {item.quantity} of these", "yellow")
                     return
 
         # Otherwise, create a new item and add it
-        new_item = Consumable(base_item.name, base_item.description, base_item.effect, quantity=amount)
+        new_item = Consumable(
+            base_item.name,
+            base_item.description,
+            base_item.effect,
+            quantity=amount,
+            sfx_name=getattr(base_item, "sfx_name", None),
+        )
         player.inventory.append(new_item)
-        print(f"You obtained {amount}x {new_item.name}!")
+        ui_print(f"You obtained {amount}x {new_item.name}!", "green")
     else:
-        print(f"Item '{item_name}' does not exist in the library.")
+        ui_print(f"Item '{item_name}' does not exist in the library.", "red")
 
 """ITEM EFFECTS START HERE"""
 
@@ -197,25 +218,25 @@ def restore_sanity(player, amount):
 
 # Dictionary of all weapons in the game
 weapon_library = {
-    "Basic dagger" : Weapon("Basic dagger", "Quick and light, but low damage", attack_range=(7,12), weapon_type='melee'),
-    "Sword" : Weapon("Ulfberht sword", "high-quality steel sword from the Viking era", attack_range=(10,20), weapon_type='melee'),
+    "Basic dagger" : Weapon("Basic dagger", "Quick and light, but low damage", attack_range=(7,12), weapon_type='melee', sfx_attack="knife_slash"),
+    "Sword" : Weapon("Ulfberht sword", "high-quality steel sword from the Viking era", attack_range=(10,20), weapon_type='melee', sfx_attack="sword_slash"),
     "Jack's hammer" : Weapon("Jack's hammer", "Jack's beloved hammer of destruction", attack_range=(50,999), weapon_type='melee'),
-    "Old revolver" : Weapon("Old revolver", "It has seen better days but seems to still be usable", attack_range=(10,16), weapon_type='gun', ammo_type='.36 Caliber', mag_size=6),
-    "MP7" : Weapon("MP7", "The MP7 is a German Personal Defense Weapon and submachine gun", attack_range=(10, 20), weapon_type="gun", ammo_type='4.6x30mm', mag_size=20),
-    "AR-15" : Weapon("AR-15", "Lightweight semi-automatic rifle", attack_range=(15, 30), weapon_type="gun", ammo_type='5.56x45mm NATO', mag_size=30),
+    "Old revolver" : Weapon("Old revolver", "It has seen better days but seems to still be usable", attack_range=(10,16), weapon_type='gun', ammo_type='.36 Caliber', mag_size=6, sfx_attack="revolver_shot", sfx_reload="revolver_reload"),
+    "MP7" : Weapon("MP7", "A German Personal Defense Weapon and submachine gun", attack_range=(10, 20), weapon_type="gun", ammo_type='4.6x30mm', mag_size=20, sfx_attack="submachine_shot", sfx_reload="reload"),
+    "AR-15" : Weapon("AR-15", "Lightweight semi-automatic rifle", attack_range=(15, 30), weapon_type="gun", ammo_type='5.56x45mm NATO', mag_size=30, sfx_attack="rifle_shot", sfx_reload="reload"),
     # Additional weapons can be added here
 }
 
 # Dictionary of all consumable items in the game
 consumable_library = {
-    "Small Health Potion": Consumable("Small Health Potion", "This odd liquid seems to have healing properties", effect=lambda player: heal_hp(player, 10), quantity=0),
-    "Large Health Potion": Consumable("Large Health Potion", "This one reminds you of the odd liquid but it seems to be pulsing with power.", effect=lambda player: heal_hp(player, 30), quantity=0),
-    "Small Sanity Potion": Consumable("Small coffee", "Small soothing container of coffee, this should calm your mind.", effect=lambda player: restore_sanity(player, 10), quantity=0),
-    "Large Sanity Potion": Consumable("Large coffee", "Full thermos container of coffee, this should calm your mind a lot.", effect=lambda player: restore_sanity(player, 20), quantity=0),
+    "Small Health Potion": Consumable("Karelian pie", "A warm, comforting pastry that restores your health with each bite.", effect=lambda player: heal_hp(player, 10), quantity=0, sfx_name="Eating"),
+    "Large Health Potion": Consumable("Rye Bread", "Hearty slice of Finnish grain. Keeps a man on the road.", effect=lambda player: heal_hp(player, 30), quantity=0, sfx_name="Eating"),
+    "Small Sanity Potion": Consumable("Small coffee", "Small soothing container of coffee, this should calm your mind.", effect=lambda player: restore_sanity(player, 10), quantity=0, sfx_name="Drinking"),
+    "Large Sanity Potion": Consumable("Large coffee", "Full thermos container of coffee, this should calm your mind a lot.", effect=lambda player: restore_sanity(player, 20), quantity=0, sfx_name="Drinking"),
     "pistol ammo": Consumable(".36 Caliber", "Revolver ammunition.", effect=None, quantity=0, type="ammo"),
     "rifle ammo": Consumable("5.56x45mm NATO", "Rifle ammunition.", effect=None, quantity=0, type="ammo"),
     "submachine ammo": Consumable("4.6x30mm", "Submachine gun ammunition.", effect=None, quantity=0, type="ammo"),
     "Markka": Consumable("Markka", "A markka is a unit of currency in Finland", effect=None, quantity=0),
-    "Makkara": Consumable("Makkara", "A makkara is a unit of currency in Finland. Wait what?!?", effect=lambda player: heal_hp(player, 100) + restore_sanity(player, 100), quantity=0),
+    "Makkara": Consumable("Makkara", "A makkara is a unit of currency in Finland. Wait what?!?", effect=lambda player: heal_hp(player, 100) + restore_sanity(player, 100), quantity=0, sfx_name="Eating"),
     # Additional items like antidotes, elixirs, etc., can be added here
 }

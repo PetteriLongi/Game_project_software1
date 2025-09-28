@@ -14,6 +14,7 @@ All functions are safe no-ops for styling if ANSI/color support is unavailable.
 """
 
 import sys
+import os
 import time
 import random
 import shutil
@@ -225,4 +226,3 @@ def gated_prompt(prompt="[Press Enter to continue…]"):
     except KeyboardInterrupt:
         # Gracefully allow skipping
         print()
-

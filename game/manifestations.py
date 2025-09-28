@@ -30,6 +30,7 @@ manifestations.py - Instructions for use in the main game file
 """
 
 import random
+from .music import play_sfx
 
 # ==========================================
 # CLASS DEFINITION: MANIFESTATION
@@ -40,12 +41,13 @@ class Manifestation:
     Represents a summonable entity (like a magical or psychic power)
     that the player can use in combat.
     """
-    def __init__(self, name, sanity_cost, special_attack, description, target_type="enemy"):
+    def __init__(self, name, sanity_cost, special_attack, description, target_type="enemy", sfx_manifest=None):
         self.name = name                        # Name of the manifestation
         self.sanity_cost = sanity_cost          # How much sanity (mana) it costs to use
         self.special_attack = special_attack    # Function that runs when used
         self.description = description          # Description shown in menu
         self.target_type = target_type          # "enemy" (default) or "self"
+        self.sfx_manifest = sfx_manifest        # Optional sound effect to play when this manifestation is used (loaded via main)
 
     # Method to use the manifestation's skill in combat
     def use_skill(self, player, enemy):
@@ -62,6 +64,12 @@ class Manifestation:
         """
         if player.sanity >= self.sanity_cost:                     # Check if player has enough sanity
             player.sanity -= self.sanity_cost                     # Reduce sanity cost
+            if getattr(self, "sfx_manifest", None):
+                try:
+                    play_sfx(self.sfx_manifest)
+                except Exception:
+                    # Fail silently if audio unavailable
+                    pass
             messages = self.special_attack(player, enemy)
             return messages                                          # Call its special attack function
         else:
@@ -132,8 +140,8 @@ def vindication_special(player, enemy):
 
 # This dictionary stores all available manifestations for easy access
 manifestation_library = {
-    "Fear": Manifestation("Fear", sanity_cost=5, special_attack=fear_special, description="Strong psychic damage."),
-    "Hope": Manifestation("Hope", sanity_cost=5, special_attack=hope_special, description="Fuels the spirit, revitalizing your body.", target_type="self"),
-    "Rage": Manifestation("Rage", sanity_cost=6, special_attack=rage_special, description="High damage but hurts you."),
-    "Vindication": Manifestation("Vindication", sanity_cost=4, special_attack=vindication_special, description="Damage + life steal."),
+    "Fear": Manifestation("Fear", sanity_cost=5, special_attack=fear_special, description="Strong psychic damage.", sfx_manifest="Fear"),
+    "Hope": Manifestation("Hope", sanity_cost=5, special_attack=hope_special, description="Fuels the spirit, revitalizing your body.", target_type="self", sfx_manifest="Hope"),
+    "Rage": Manifestation("Rage", sanity_cost=6, special_attack=rage_special, description="High damage but hurts you.", sfx_manifest="Rage"),
+    "Vindication": Manifestation("Vindication", sanity_cost=4, special_attack=vindication_special, description="Damage + life steal.", sfx_manifest="Vindication"),
 }

@@ -104,6 +104,19 @@ def priest_curse(enemy, player, enemies):
     messages.append(f"Your sanity is reduced by {dmg}!")
     return messages
 
+def Rite_of_reclamation(enemy, player, enemies):
+    """
+    Special attack for Anatomist.
+    Does damage to the player and heals itself.
+    """
+    messages = []
+    dmg = random.randint(4, 10)
+    player.hp -= dmg
+    heal = dmg
+    enemy.hp = min(enemy.max_hp, enemy.hp + heal)
+    messages.append(f"{enemy.name} strikes you for {dmg} damage!")
+    messages.append(f"The Anatomist licks its blade clean and regains {heal} HP!")
+    return messages
 
 def whisperer_psychic(enemy, player, enemies):
     """
@@ -116,6 +129,33 @@ def whisperer_psychic(enemy, player, enemies):
     player.sanity = max(0, player.sanity - 2)
     messages.append(f"{enemy.name} whispers forbidden truths...")
     messages.append(f"You take {dmg} psychic damage and lose 2 sanity!")
+    return messages
+
+def Call_of_the_Hollow(enemy, player, enemies):
+    """
+    Special attack for Dirge of the Deep.
+    - Summons 1 "Drowned fragment" if none exists in the current round list.
+    - If a fragment exists (alive or dead) in this round's list, Dirge attacks instead.
+
+    Note: Dead fragments are cleaned up at end-of-round in the combat loop,
+    preventing immediate same-round re-summoning after a kill.
+    """
+    messages = []
+
+    # Block summoning if any fragment (alive or dead) is present this round.
+    fragment_exists_this_round = any(e.name == "Drowned fragment" for e in enemies)
+
+    if not fragment_exists_this_round:
+        messages.append(f"{enemy.name} whispers forbidden truths...")
+        fragment = create_enemy("Drowned fragment")
+        enemies.append(fragment)
+        messages.append("A Drowned fragment slithers into existence!")
+    else:
+        # If a fragment already exists this round, Dirge attacks instead of summoning.
+        dmg = random.randint(3, 8)
+        player.hp -= dmg
+        messages.append(f"{enemy.name} lashes out for {dmg} damage!")
+
     return messages
 
 
@@ -138,26 +178,31 @@ def abomination_crush(enemy, player, enemies):
 # This is a dictionary of all predefined enemies in the game.
 # Each entry can be used to spawn a fresh copy of that enemy.
 enemy_library = {
-    # Difficulty 1: Cultists
+    # Difficulty 1: 
     "Cultist": Enemy("Cultist", difficulty=1, hp=20, attack=(3, 6), description="Fanatical servant of the cult.", exp_reward=10),
+    "Drowned fragment": Enemy("Drowned fragment", difficulty=1, hp=10, attack=(1, 5), description="A fragment of the drowned.", exp_reward=5),
 
-    # Difficulty 2: Apostles
+    # Difficulty 2: 
     # Apostle: demonstrates an ally-targeting special (heals lowest-HP ally)
     # special_attack_chance=1 means it will always try to use the special each turn
-    "Apostle": Enemy("Apostle", difficulty=2, hp=28, attack=(4, 7), special_attack=apostle_buff, special_attack_chance=1,
-                      description="Disciple that heals itself with hymns.", exp_reward=20),
+    "Apostle": Enemy("Apostle", difficulty=2, hp=28, attack=(4, 7), special_attack=apostle_buff, 
+                     special_attack_chance=0.3, description="Disciple that heals itself with hymns.", exp_reward=20),
 
-    # Difficulty 3: High Priests
+    # Difficulty 3: 
     "High Priest": Enemy("High Priest", difficulty=3, hp=35, attack=(5, 9), special_attack=priest_curse,
-                         description="Leader who curses your sanity.", exp_reward=30),
+                         special_attack_chance=0.3, description="Leader who curses your sanity.", exp_reward=30),
+    "Anatomist": Enemy("Anatomist", difficulty=3, hp=40, attack=(5, 10), special_attack=Rite_of_reclamation,
+                         special_attack_chance=1, description="It works by intuition, hands guided by a voice only it can hear.", exp_reward=30),
 
-    # Difficulty 4: Whisperers
+    # Difficulty 4: 
     "Whisperer": Enemy("Whisperer", difficulty=4, hp=30, attack=(4, 10), special_attack=whisperer_psychic,
-                       description="Maddening voice that eats away at your mind.", exp_reward=10),
+                       special_attack_chance=0.3, description="Maddening voice that eats away at your mind.", exp_reward=40),
+    "Dirge of the Deep": Enemy("Dirge of the Deep", difficulty=4, hp=34, attack=(3, 8), special_attack=Call_of_the_Hollow,
+                       special_attack_chance=1, description="A veiled entity that calls the void to your location.", exp_reward=35),
 
-    # Difficulty 5: Abominations
+    # Difficulty 5: 
     "Abomination": Enemy("Abomination", difficulty=5, hp=50, attack=(6, 12), special_attack=abomination_crush,
-                         description="Horrific mutation of flesh and shadow.", exp_reward=50),
+                         special_attack_chance=0.3, description="Horrific mutation of flesh and shadow.", exp_reward=50),
 }
 
 # ==========================================

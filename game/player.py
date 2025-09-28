@@ -5,7 +5,6 @@ This file contains the `Player` class. A Player has stats like HP and Sanity,
 an inventory, an optional weapon, and a list of unlocked manifestations
 (special skills).
 """
-
 # ==========================================
 # PLAYER CLASS
 # ==========================================
@@ -46,9 +45,17 @@ class Player:
     def gain_exp(self, amount):
         """Add EXP and trigger level-ups as needed."""
         self.exp += amount
-        print(f"\033[94mYou gain {amount} EXP!\033[0m")
+        # Use UI helper for consistent styling (lazy import avoids circulars)
+        try:
+            from .ui import ui_print  # type: ignore
+            ui_print(f"You gain {amount} EXP!", "blue")
+        except Exception:
+            # Fallback if UI unavailable
+            print(f"You gain {amount} EXP!")
         while self.exp >= self.exp_to_next:
-            self.level_up()
+            # Lazy import to avoid any potential circulars at module import time
+            from .ui import level_up_display  # type: ignore
+            level_up_display(self)
 
     def level_up(self):
         """Increase player level and improve core stats.
@@ -69,7 +76,6 @@ class Player:
         self.max_sanity += sanity_gain
         self.sanity = self.max_sanity
         self.base_attack = (self.base_attack[0] + attack_gain, self.base_attack[1] + attack_gain)
-        print(f"\033[92mYou leveled up to level {self.level}! HP +{hp_gain}, Sanity +{sanity_gain}, Attack +{attack_gain}\033[0m")
 
     # ==========================================
     # EQUIPMENT & ITEM USAGE
@@ -77,7 +83,11 @@ class Player:
     def equip_weapon(self,weapon):
         """Equip a weapon from inventory for use in combat."""
         self.weapon = weapon
-        print(f"\033[92mYou equipped {weapon.name}!\033[0m")
+        try:
+            from .ui import ui_print  # type: ignore
+            ui_print(f"You equipped {weapon.name}!", "green")
+        except Exception:
+            print(f"You equipped {weapon.name}!")
 
     def use_item(self, item):
         """Use an item (or consumable) from the inventory on the player.
