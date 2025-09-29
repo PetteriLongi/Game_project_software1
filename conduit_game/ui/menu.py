@@ -14,7 +14,9 @@ HELP
   [2] Inventory   - shows Markka / HP / Sanity and distances
   [3] Rest        - fully restore HP and Sanity
   [H] Help        - this help
-  [Q] Quit
+  [Q] Quit        - quits the game
+  [Space bar]      - Skip current line. The rest of that line prints instantly, then normal speed resumes on the next line.
+  [Enter]         - Print the rest of the entire text instantly.
 
 Notes
   • Start at HEL; HEL is not among the 10 options; you cannot return to HEL.
