@@ -1,4 +1,4 @@
-#test
+#test 1
 # doomclock_game.py
 # ============================================================
 # Doom Clock Combat Demo — standalone, no external libraries
