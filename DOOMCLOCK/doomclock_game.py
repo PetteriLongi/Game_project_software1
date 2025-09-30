@@ -1,3 +1,4 @@
+#test
 # doomclock_game.py
 # ============================================================
 # Doom Clock Combat Demo — standalone, no external libraries
@@ -8,7 +9,7 @@ from typing import Callable, Dict, List, Optional, Tuple
 
 # ------------------------------------------------------------
 # Utility: colored status bars
-# ------------------------------------------------------------
+# -------------------------------------------------------
 def draw_bar(label: str, current: int, maximum: int,
             bar_length: int = 20, color: str = "default",
             name_width: int = 12) -> str:
