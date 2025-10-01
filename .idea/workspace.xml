@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="5cce6d05-3632-4545-866a-c20e1d62116c" name="Changes" comment="Merged Pathirage's work with Pete's.&#10;This version of the game is mostly done, all story and functionality is added. Needs polishing with more music and sounds and to finish the main game itself. Also need to still merge it with Derej's and Jack's code." />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="Petes_Combat_System_fleshed_more" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;PetteriLongi&quot;
+  }
+}</component>
+  <component name="GithubDefaultAccount">
+    <option name="defaultAccountId" value="2ee1da06-804b-4cdd-a98f-3912986a9508" />
+  </component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/PetteriLongi/Game_project_software1.git&quot;,
+    &quot;accountId&quot;: &quot;2ee1da06-804b-4cdd-a98f-3912986a9508&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="32vgFfAOSknfJ1GvyfsXgQL1J01" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.combat.executor": "Run",
+    "Python.items.executor": "Run",
+    "Python.main.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "master",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "C:/Users/petel/PycharmProjects/Game_project_software1",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="PyConsoleOptionsProvider">
+    <option name="myPythonConsoleState">
+      <console-settings module-name="Game_project_software1" is-module-sdk="true">
+        <option name="myUseModuleSdk" value="true" />
+        <option name="myModuleName" value="Game_project_software1" />
+      </console-settings>
+    </option>
+    <option name="myUseExistingConsole" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\petel\PycharmProjects\Game_project_software1\game" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-9c94529fcfe0-JavaScript-PY-252.26199.168" />
+        <option value="bundled-python-sdk-b3d66beaba9a-c6efb3732140-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.26199.168" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="5cce6d05-3632-4545-866a-c20e1d62116c" name="Changes" comment="" />
+      <created>1758306359283</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1758306359283</updated>
+      <workItem from="1758306361157" duration="81313000" />
+      <workItem from="1758977110159" duration="5666000" />
+      <workItem from="1759007914810" duration="1010000" />
+      <workItem from="1759051380671" duration="3576000" />
+      <workItem from="1759318968343" duration="1219000" />
+      <workItem from="1759322464106" duration="63000" />
+    </task>
+    <task id="LOCAL-00001" summary="Pete's combat system backbone for a test branch">
+      <option name="closed" value="true" />
+      <created>1758383047396</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1758383047396</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Pete's combat system  for a bit more fleshed out version of the combat system with added mechanics and visuals. still in aplha phase.">
+      <option name="closed" value="true" />
+      <created>1758980753338</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1758980753338</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Pete's combat system  for a bit more fleshed out version of the combat system with added mechanics and visuals. still in aplha phase.">
+      <option name="closed" value="true" />
+      <created>1758980781532</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1758980781533</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Pete's combat system  for a bit more fleshed out version of the combat system with added mechanics and visuals. still in aplha phase. added music and sound effects">
+      <option name="closed" value="true" />
+      <created>1759008654121</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1759008654121</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Pete's combat system  for a bit more fleshed out version of the combat system this patch add more to the soundscape and visual design of the game.">
+      <option name="closed" value="true" />
+      <created>1759070568539</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1759070568539</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Merged Pathirage's work with Pete's.&#10;This version of the game is mostly done, all story and functionality is added. Needs polishing with more music and sounds and to finish the main game itself. Also need to still merge it with Derej's and Jack's code.">
+      <option name="closed" value="true" />
+      <created>1759322385948</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1759322385948</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Pete's combat system backbone for a test branch" />
+    <MESSAGE value="Pete's combat system  for a bit more fleshed out version of the combat system with added mechanics and visuals. still in aplha phase." />
+    <MESSAGE value="Pete's combat system  for a bit more fleshed out version of the combat system with added mechanics and visuals. still in aplha phase. added music and sound effects" />
+    <MESSAGE value="Pete's combat system  for a bit more fleshed out version of the combat system this patch add more to the soundscape and visual design of the game." />
+    <MESSAGE value="Merged Pathirage's work with Pete's.&#10;This version of the game is mostly done, all story and functionality is added. Needs polishing with more music and sounds and to finish the main game itself. Also need to still merge it with Derej's and Jack's code." />
+    <option name="LAST_COMMIT_MESSAGE" value="Merged Pathirage's work with Pete's.&#10;This version of the game is mostly done, all story and functionality is added. Needs polishing with more music and sounds and to finish the main game itself. Also need to still merge it with Derej's and Jack's code." />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/Game_project_software1$items.coverage" NAME="items Coverage Results" MODIFIED="1758384750028" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/game" />
+    <SUITE FILE_PATH="coverage/Game_project_software1$combat.coverage" NAME="combat Coverage Results" MODIFIED="1758376398667" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/game" />
+    <SUITE FILE_PATH="coverage/type_key_wav$main.coverage" NAME="main Coverage Results" MODIFIED="1759321966356" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Game_project_software1$main.coverage" NAME="main Coverage Results" MODIFIED="1758741149039" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+  </component>
+</project>
