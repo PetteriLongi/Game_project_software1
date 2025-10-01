@@ -153,6 +153,18 @@ def handle_inventory(player):
             msgs.append("")
             return turn_consumed, msgs
 
+        if pick.lower() == "u":
+            if player.weapon is not None:
+                player.weapon = None
+                turn_consumed = True
+                msgs.append(colouring("You unequip your weapon.", "blue"))
+                msgs.append("")
+                return turn_consumed, msgs
+            else: 
+                msgs.append(colouring("You have no weapon equipped!", "yellow"))
+                msgs.append("")
+                return turn_consumed, msgs
+
         if pick.isdigit():
             index = int(pick)
             if 1 <= index <= len(total_items):

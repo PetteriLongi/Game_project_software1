@@ -176,6 +176,7 @@ def render_inventory(player, weapons_list, consumables_list):
         # Print the unified table 
         console.print(items_table)
         console.print(Text("0. Back to action menu", style="bold cyan"))
+        console.print(Text("Type 'u' to unequip current weapon", style="dim cyan"))
     else:
         _render_inventory_ascii(player, weapons_list, consumables_list)
 
@@ -226,7 +227,8 @@ def _render_inventory_ascii(player, weapons_list, consumables_list):
         print("  (none)")
 
     print("\n0. Back to action menu")
-    print("Choose an item to equip/use (0 to back):")
+    print("Type 'u' to unequip current weapon")
+    print("Choose an item to equip/use (0 to back, u to unequip):")
 
 
 # ========================================
