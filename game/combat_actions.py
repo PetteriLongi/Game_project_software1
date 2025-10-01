@@ -145,39 +145,46 @@ def handle_inventory(player):
     total_items.extend(weapons_list)
     total_items.extend(consumables_list)
 
-    pick = input("> ").strip()
+    while True:
+        pick = input("> ").strip()
 
-    if pick == "0":
-        msgs.append(colouring("You leave your inventory.", "blue"))
-        msgs.append("")
-        return turn_consumed, msgs
+        if pick == "0":
+            msgs.append(colouring("You leave your inventory.", "blue"))
+            msgs.append("")
+            return turn_consumed, msgs
 
-    if pick.isdigit():
-        index = int(pick)
-        if 1 <= index <= len(total_items):
-            turn_consumed = True
-            selected = total_items[index - 1]
-        match selected:
-            case Weapon():
-                player.weapon = selected
-                msgs.append(colouring(f"You equipped {selected.name}", "green"))
+        if pick.isdigit():
+            index = int(pick)
+            if 1 <= index <= len(total_items):
+                turn_consumed = True
+                selected = total_items[index - 1]
+                break
+            else:
+                print(colouring("Invalid selection. Please choose a number from the available options.", "yellow"))
+        else:
+            print(colouring("Invalid input. Please enter a number.", "yellow"))
+            
+    match selected:
+        case Weapon():
+            player.weapon = selected
+            msgs.append(colouring(f"You equipped {selected.name}", "green"))
+            msgs.append("")
+        case Consumable():
+            msg = selected.use(player)
+            if msg:
+                msgs.append(msg)
+            if selected.quantity <= 0:
+                msgs.append(colouring(f"{selected.name} is depleted!", "red"))
+                player.inventory.remove(selected)
                 msgs.append("")
-            case Consumable():
-                msg = selected.use(player)
-                if msg:
-                    msgs.append(msg)
-                if selected.quantity <= 0:
-                    msgs.append(colouring(f"{selected.name} is depleted!", "red"))
-                    player.inventory.remove(selected)
-                    msgs.append("")
-            case Item():
-                msg = selected.use(player)
-                if msg:
-                    msgs.append(msg)
-                msgs.append("")
-            case _:
-                msgs.append(colouring("Invalid item action...", "yellow"))
-                msgs.append("")
+        case Item():
+            msg = selected.use(player)
+            if msg:
+                msgs.append(msg)
+            msgs.append("")
+        case _:
+            msgs.append(colouring("Invalid item action...", "yellow"))
+            msgs.append("")
 
     return (turn_consumed, msgs)
 

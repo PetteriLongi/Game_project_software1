@@ -174,7 +174,7 @@ Game_project_software1/
  - Standardized printing: use `ui_print(text, colour=None)` everywhere for consistent Rich/ASCII output.
 
 ## Demo Flow (`main.py`)
-- Creates a player with the `Fear`, `Hope`, `Rage`, and `Vindication` manifestations
+- Creates a player with the `Fear`, `Hope`, `Rage`, and `Resentment` manifestations
 - Gives starter items/weapons (dagger, sword, AR-15, MP7, potions, ammo)
 - Runs two combat encounters
 - Prints a hint at startup indicating whether Rich UI is enabled or ASCII fallback is in use.
@@ -217,6 +217,7 @@ pip install rich
   looming horror appears) The longer you go without resting, the more “strange events” happen.)
 - A store you can visit to buy items and weapons
 - standardize the UI to use ui_print() 
+- Graceful Defeat handling  (now it just brute forces a sys.exit)
 
 ## Requirements File
 If you prefer a requirements.txt:
@@ -226,7 +227,8 @@ rich>=13.0.0
 ```
 
 ## Credits
-- Audio assets under `Music/` are local placeholders for development/testing. Please ensure you have the proper rights/license to distribute or use any tracks you add.
+- Audio assets under `Music/` are not created by us. 
+- Credits for the music goes to: Pixabay and fesliyanstudios
 
 ## License
 This project is for educational purposes. Add a LICENSE file if you plan to distribute.

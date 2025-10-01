@@ -39,7 +39,7 @@ SFX_CATALOG = [
     ("Fear", "Music/SFX/Manifestation/Fear.wav", 0.12, 5),
     ("Hope", "Music/SFX/Manifestation/Hope.wav", 0.12, 5),
     ("Rage", "Music/SFX/Manifestation/Rage.wav", 0.12, 5),
-    ("Vindication", "Music/SFX/Manifestation/Vindication.wav", 0.12, 5),
+    ("Resentment", "Music/SFX/Manifestation/Resentment.wav", 0.12, 5),
 ]
 
 

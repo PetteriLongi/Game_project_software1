@@ -34,7 +34,7 @@ class Enemy:
     Each enemy has a name, difficulty level, health points (HP),
     attack range, optional special attack, and a description.
     """
-    def __init__(self, name, difficulty, hp, attack, special_attack=None, special_attack_chance=0.3, description="", exp_reward=10):
+    def __init__(self, name, difficulty, hp, attack, special_attack=None, special_attack_chance=0.3, death_effect=None, description="", exp_reward=10):
         self.name = name                    # Enemy's name
         self.difficulty = difficulty        # Difficulty rating (can be used for scaling loot, XP, etc.)
         self.hp = hp                        # Current health
@@ -42,6 +42,7 @@ class Enemy:
         self.attack = attack                # Tuple (min_damage, max_damage) for regular attack
         self.special_attack = special_attack  # Optional function for special abilities
         self.special_attack_chance = special_attack_chance  # configurable per enemy
+        self.death_effect = death_effect    # Optional function for death effects
         self.description = description      # Description for flavor text
         self.exp_reward = exp_reward  # How much EXP the player gets for defeating this enemy
 
@@ -118,6 +119,15 @@ def Rite_of_reclamation(enemy, player, enemies):
     messages.append(f"The Anatomist licks its blade clean and regains {heal} HP!")
     return messages
 
+def unstable_form_death(enemy, player, enemies):
+    """
+    Special attack for Starborn.
+    as it dies it damages the player.
+    """
+    dmg = random.randint(4, 10)
+    player.hp -= dmg
+    return f"{enemy.name} collapses, its unstable form tearing itself apart and striking you for {dmg} damage!"
+    
 def whisperer_psychic(enemy, player, enemies):
     """
     Special attack for Whisperers.
@@ -179,6 +189,7 @@ def abomination_crush(enemy, player, enemies):
 # Each entry can be used to spawn a fresh copy of that enemy.
 enemy_library = {
     # Difficulty 1: 
+    "Tutorial": Enemy("Wounded Cultist", difficulty=1, hp=20, attack=(1, 3), description="Fanatical servant of the cult.", exp_reward=0),
     "Cultist": Enemy("Cultist", difficulty=1, hp=20, attack=(3, 6), description="Fanatical servant of the cult.", exp_reward=10),
     "Drowned fragment": Enemy("Drowned fragment", difficulty=1, hp=10, attack=(1, 5), description="A fragment of the drowned.", exp_reward=5),
 
@@ -193,8 +204,10 @@ enemy_library = {
                          special_attack_chance=0.3, description="Leader who curses your sanity.", exp_reward=30),
     "Anatomist": Enemy("Anatomist", difficulty=3, hp=40, attack=(5, 10), special_attack=Rite_of_reclamation,
                          special_attack_chance=1, description="It works by intuition, hands guided by a voice only it can hear.", exp_reward=30),
+    "Starborn": Enemy("Starborn", difficulty=3, hp=12, attack=(4, 10), death_effect=unstable_form_death,
+                         description="Once humans, now hollow vessels etched with constellations. Fragile, but every death tears a hole in reality.", exp_reward=30),
 
-    # Difficulty 4: 
+    # Difficulty 4:                     
     "Whisperer": Enemy("Whisperer", difficulty=4, hp=30, attack=(4, 10), special_attack=whisperer_psychic,
                        special_attack_chance=0.3, description="Maddening voice that eats away at your mind.", exp_reward=40),
     "Dirge of the Deep": Enemy("Dirge of the Deep", difficulty=4, hp=34, attack=(3, 8), special_attack=Call_of_the_Hollow,
@@ -222,6 +235,7 @@ def create_enemy(name):
         template.attack,
         special_attack = template.special_attack,
         special_attack_chance= template.special_attack_chance,
+        death_effect = template.death_effect,
         description = template.description,
         exp_reward = template.exp_reward
     )

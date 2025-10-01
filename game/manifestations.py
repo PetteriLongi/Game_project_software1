@@ -121,16 +121,16 @@ def rage_special(player, enemy):
     return messages
 
 #despairs special attack steals HP from the enemy
-def vindication_special(player, enemy):
+def resentment_special(player, enemy):
     """
-    Vindication manifestation: Damages enemy and heals the player.
+    Resentment manifestation: Damages enemy and heals the player.
     """
     dmg = random.randint(4, 25)
     enemy.hp -= dmg
     heal = dmg // 2
     player.hp = min(player.max_hp, player.hp + heal)
     messages = [
-        f"\033[95mManifestation of Vindication drains life from {enemy.name}!\033[0m",
+        f"\033[95mManifestation of Resentment drains life from {enemy.name}!\033[0m",
         f"\033[95mIt deals {dmg} damage and heals you for {heal}.\033[0m"
     ]
     return messages
@@ -143,5 +143,5 @@ manifestation_library = {
     "Fear": Manifestation("Fear", sanity_cost=5, special_attack=fear_special, description="Strong psychic damage.", sfx_manifest="Fear"),
     "Hope": Manifestation("Hope", sanity_cost=5, special_attack=hope_special, description="Fuels the spirit, revitalizing your body.", target_type="self", sfx_manifest="Hope"),
     "Rage": Manifestation("Rage", sanity_cost=6, special_attack=rage_special, description="High damage but hurts you.", sfx_manifest="Rage"),
-    "Vindication": Manifestation("Vindication", sanity_cost=4, special_attack=vindication_special, description="Damage + life steal.", sfx_manifest="Vindication"),
+    "Resentment": Manifestation("Resentment", sanity_cost=4, special_attack=resentment_special, description="Damage + life steal.", sfx_manifest="Resentment"),
 }

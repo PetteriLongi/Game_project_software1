@@ -12,13 +12,16 @@ Instructions:
 #This is our H.P Lovecraft inspired software game project!
 # Fancy ASCII title for the game (just visual flair)
 print("""
-##      ## ######## ##        ######   #######  ##     ## ########    ########  #######     ######## ##     ## ########     ######      ###    ##     ## ######## 
-##  ##  ## ##       ##       ##    ## ##     ## ###   ### ##             ##    ##     ##       ##    ##     ## ##          ##    ##    ## ##   ###   ### ##       
-##  ##  ## ##       ##       ##       ##     ## #### #### ##             ##    ##     ##       ##    ##     ## ##          ##         ##   ##  #### #### ##       
-##  ##  ## ######   ##       ##       ##     ## ## ### ## ######         ##    ##     ##       ##    ######### ######      ##   #### ##     ## ## ### ## ######   
-##  ##  ## ##       ##       ##       ##     ## ##     ## ##             ##    ##     ##       ##    ##     ## ##          ##    ##  ######### ##     ## ##       
-##  ##  ## ##       ##       ##    ## ##     ## ##     ## ##             ##    ##     ##       ##    ##     ## ##          ##    ##  ##     ## ##     ## ##       
- ###  ###  ######## ########  ######   #######  ##     ## ########       ##     #######        ##    ##     ## ########     ######   ##     ## ##     ## ########  
+ ██▀███   ██▓▄▄▄█████▓▓█████   ██████     ▒█████    █████▒   ▄▄▄█████▓ ██▀███   ▄▄▄       ███▄    █   ██████  ██▓▄▄▄█████▓
+▓██ ▒ ██▒▓██▒▓  ██▒ ▓▒▓█   ▀ ▒██    ▒    ▒██▒  ██▒▓██   ▒    ▓  ██▒ ▓▒▓██ ▒ ██▒▒████▄     ██ ▀█   █ ▒██    ▒ ▓██▒▓  ██▒ ▓▒
+▓██ ░▄█ ▒▒██▒▒ ▓██░ ▒░▒███   ░ ▓██▄      ▒██░  ██▒▒████ ░    ▒ ▓██░ ▒░▓██ ░▄█ ▒▒██  ▀█▄  ▓██  ▀█ ██▒░ ▓██▄   ▒██▒▒ ▓██░ ▒░
+▒██▀▀█▄  ░██░░ ▓██▓ ░ ▒▓█  ▄   ▒   ██▒   ▒██   ██░░▓█▒  ░    ░ ▓██▓ ░ ▒██▀▀█▄  ░██▄▄▄▄██ ▓██▒  ▐▌██▒  ▒   ██▒░██░░ ▓██▓ ░ 
+░██▓ ▒██▒░██░  ▒██▒ ░ ░▒████▒▒██████▒▒   ░ ████▓▒░░▒█░         ▒██▒ ░ ░██▓ ▒██▒ ▓█   ▓██▒▒██░   ▓██░▒██████▒▒░██░  ▒██▒ ░ 
+░ ▒▓ ░▒▓░░▓    ▒ ░░   ░░ ▒░ ░▒ ▒▓▒ ▒ ░   ░ ▒░▒░▒░  ▒ ░         ▒ ░░   ░ ▒▓ ░▒▓░ ▒▒   ▓▒█░░ ▒░   ▒ ▒ ▒ ▒▓▒ ▒ ░░▓    ▒ ░░   
+  ░▒ ░ ▒░ ▒ ░    ░     ░ ░  ░░ ░▒  ░ ░     ░ ▒ ▒░  ░             ░      ░▒ ░ ▒░  ▒   ▒▒ ░░ ░░   ░ ▒░░ ░▒  ░ ░ ▒ ░    ░    
+  ░░   ░  ▒ ░  ░         ░   ░  ░  ░     ░ ░ ░ ▒   ░ ░         ░        ░░   ░   ░   ▒      ░   ░ ░ ░  ░  ░   ▒ ░  ░      
+   ░      ░              ░  ░      ░         ░ ░                         ░           ░  ░         ░       ░   ░           
+
 """)
 
 import shutil
@@ -33,23 +36,27 @@ from game import (
     manifestation_library,
     create_enemy,
     add_weapon_to_inventory, add_item_to_inventory,
-    play_music,
+    play_music, stop_music,
     print_typewriter,
-    ui_print,
+    ui_print, level_up_display,
+    intro,
+    run_story, STORY_MAP, make_choice, wait_for_input
 )
 # UI capability flag (for hinting Rich availability to the user)
+from game.music import stop_music
 from game.ui import RICH_AVAILABLE
 # Getting all the sound files from sfx_loader and registering them
 from game.sfx_loader import register_all_sfx
 register_all_sfx()
+
+print("Manifestations available:", list(manifestation_library.keys()))
 
 if __name__ == "__main__":
     # ==========================================
     # PLAYER SETUP
     # ==========================================
     # Create our player character.
-    # Start with only the "Fear" manifestation unlocked to keep the tutorial simple.
-    unlocked_manifestations = [manifestation_library["Fear"], manifestation_library["Hope"], manifestation_library["Rage"], manifestation_library["Vindication"]]
+    unlocked_manifestations = []
     player = Player("Hero", unlocked_manifestations)
 
     # Determine terminal width for nicer wrapping (fallback to 80)
@@ -60,41 +67,77 @@ if __name__ == "__main__":
     if not RICH_AVAILABLE:
         print("\nNote: Rich not detected. Using ASCII UI. Install 'rich' for enhanced inventory and status visuals.")
     else:
-        print("\nRich UI enabled. Enjoy enhanced inventory and status visuals.")
+        print("\nRich UI enabled. Enjoy enhanced inventory and status visuals.\n")
+
+
 
     # ==========================================
-    # NARRATIVE INTRO (OPTIONAL)
+    # NARRATIVE 
     # ==========================================
+    add_weapon_to_inventory(player, "AR-15", current_mag=13)
+    add_item_to_inventory(player, "rifle ammo", 10)   
     play_music("Music/ambience/Piano_suspense.mp3", volume=0.12, loop=True)
 
-    print_typewriter("""The journey leaves you hollow.
-Another airport.
-Another silence where life should be.
-But this time,
-it isn’t empty.
-Figures linger ahead,
-robes shifting like shadow and blood.
-Their chants rise and fall,
-a hymn that claws at your skin.
-Most you recognize,
-the same cultists who fell in Helsinki.
-But one stands apart.
-A heavy tome rests in his hands,
-its pages breathing with symbols
-that squirm like insects across the paper.
-When he speaks,
-the air itself seems to recoil.
+    # ==========================================
+    # INTRO
+    # ==========================================
+    player.manifestations.append(manifestation_library["Fear"])
+    intro()
+    player.gain_exp(50)
+    stop_music()
+    
+    # ==========================================
+    # CONDUIT 2
+    # ==========================================
+    run_story("2_conduit", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
+    # Here we can give rewards afther the combat encounter
 
-"I am an Apostle of the Hymn."
+    run_story("2_conduit.aftermath", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
+    # Here we should add the manifestation unlocked here
+    player.manifestations.append(manifestation_library["Hope"])
 
-His eyes narrow,
-fixing you with disbelief.
+    # ==========================================
+    # CONDUIT 3
+    # ==========================================
+    run_story("3_conduit", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
+    #Here we can give combat rewards
 
-"What business does a stray civilian have here?
-How did you breach the veil?"
-""",
-        mode="calm", sfx=True, sfx_channel=7, sfx_channel_2=6, sfx_key_name="type_key")
+    run_story("3_first_encounter.aftermath", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
+    #Here we should add the manifestation unlocked here
+    player.manifestations.append(manifestation_library["Resentment"])
 
+    run_story("defiance_anatomist.combat", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
+    # Here we can give rewards the story cuts after the bossfight and below it continues after it 
+
+    run_story("anatomist.aftermath", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
+
+    # ==========================================    
+    # CONDUIT 4
+    # ==========================================    
+    run_story("4_conduit", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
+    #Here we can give combat rewards
+
+    run_story("4_conduit.encounter", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
+    # Here we should add the manifestation unlocked here
+    player.manifestations.append(manifestation_library["Rage"])
+
+    run_story("4_conduit.defy", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
+    # Here we can give rewards the story cuts after the bossfight and below it continues after it 
+
+    run_story("4_conduit.aftermath", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
+    
+    # ==========================================
+    # CONDUIT 5
+    # ==========================================
+    run_story("5_conduit", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
+
+    
+
+    # ==========================================
+    # IMPORTANT: EVERYTHING UNDER THIS COMMENT IS JUST TO SHOW HOW TO CALL THESE FUNCTIONS
+    #            AND FOR TESTING PURPOSES
+    #            NEEDS TO BE REWRITTEN COMPLETELY LATER TO BUILD THE GAME PROPERLY
+    # ==========================================
     # ==========================================
     # STARTING GEAR (FEEL FREE TO TWEAK)
     # ==========================================
@@ -112,6 +155,11 @@ How did you breach the veil?"
     add_item_to_inventory(player, "submachine ammo", 10)
     add_weapon_to_inventory(player, "AR-15", current_mag=13)        # Starts with a full magazine
     add_weapon_to_inventory(player, "MP7", current_mag=14)
+
+    run_story("2_conduit", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
+    player.manifestations.append(manifestation_library["Hope"])
+    add_item_to_inventory(player, "Large Health Potion", 2)
+    run_story("whispering_conduit.defiance", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
 
     # Pause so the player can read the setup text above (optional)
     #pygame.mixer.music.fadeout(2000) #this causes a 2, second delay before the combat starts

@@ -21,8 +21,8 @@ class Player:
         self.level = 1
         self.exp = 0
         self.exp_to_next = 50
-        self.max_hp = 40
-        self.hp = 40
+        self.max_hp = 4000
+        self.hp = 4000
         self.max_sanity = 15
         self.sanity = 15
         self.base_attack = (4, 8)            # Fallback damage if no weapon is equipped

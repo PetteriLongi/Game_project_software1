@@ -32,8 +32,10 @@ Inputs and data:
 End conditions:
 - Combat ends when all enemies are defeated (victory) or the player HP reaches 0 (defeat).
 """
-
+import sys
 import random
+
+from game.writing_effects import red_flash
 
 from .items import Weapon, Item, Consumable
 from .ui import exp_hint, colouring
@@ -158,6 +160,21 @@ def combat(player, enemies_list):
         if turn_consumed:
             for enemy in enemies_list:
                 if enemy.hp <= 0:
+                    # Call the death effect if it exists
+                    if getattr(enemy, "death_effect", None) and not getattr(enemy, "death_effect_called", False):
+                        try:
+                            msgs = enemy.death_effect(enemy, player, enemies_list)
+                            if msgs:
+                                if isinstance(msgs, list):
+                                    for m in msgs:
+                                        player_log.append(m)
+                                else:
+                                    player_log.append(str(msgs))
+                                player_log.append("")
+                        except Exception:
+                            pass
+                        setattr(enemy, "death_effect_called", True)
+                        
                     if not getattr(enemy, "exp_awarded", False):
                         player.gain_exp(enemy.exp_reward)
                         enemy.exp_awarded = True
@@ -212,5 +229,6 @@ def combat(player, enemies_list):
 
     # Player has been defeated
     if player.hp <= 0:
-        print(colouring("\nYour body collapses... The cult claims another victim.", "red"))
-        return False
+        print(colouring("\nYour body collapses... The cult claims another victim.\n", "red"))
+        red_flash("It seems this is all you amounted to in the end...", flashes=10, on_time=0.5, off_time=0.5)
+        return sys.exit()

@@ -88,7 +88,7 @@ def level_up_display(player):
         console.print(panel_level_up)
         pygame.mixer.music.pause()
         play_sfx("level_up")
-        time.sleep(4)
+        time.sleep(1)
         pygame.mixer.music.unpause()
         console.print(Text("Press Enter to continue...", style="bold magenta"))
         console.input("")
@@ -256,7 +256,7 @@ def ui_print(text: str, colour: str | None = None):
             console.print(str(text))
     else:
         if colour:
-            print(colouring(str(text, colour)))
+            print(colouring(str(text), colour))
         else:
             print(str(text))
 

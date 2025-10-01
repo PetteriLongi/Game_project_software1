@@ -93,7 +93,8 @@ def print_typewriter(
     sfx_return_name=None,
     allow_skip=True,
     skip_line_key=" ",
-    skip_all_key="\r"
+    skip_all_key="\r",
+    force_skip_all=False,
 ):
 
     last_click_ts = 0.0
@@ -118,7 +119,8 @@ def print_typewriter(
 
     # skip state
     skip_line = False
-    skip_all = False
+    # Allow callers (like a one-off story intro) to begin in skip-all mode
+    skip_all = bool(force_skip_all)
 
     for ch in text:
         # Poll keyboard (non-blocking) to update skip states
