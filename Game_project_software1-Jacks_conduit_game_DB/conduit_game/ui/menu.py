@@ -58,4 +58,4 @@ def game_loop(state: RunState):
                 print("Please enter a number between 1 and 10.")
             continue
 
-        print("Unknown command. Use 1,2,3,H, or 9.")
+        print("Unknown command. Use 1,2,3,H, or Q.")
