@@ -75,6 +75,7 @@ if __name__ == "__main__":
     # NARRATIVE 
     # ==========================================
     add_weapon_to_inventory(player, "AR-15", current_mag=13)
+    add_weapon_to_inventory(player, "Basic dagger")
     add_item_to_inventory(player, "rifle ammo", 10)   
     play_music("Music/ambience/Piano_suspense.mp3", volume=0.12, loop=True)
 
