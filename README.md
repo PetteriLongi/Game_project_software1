@@ -1,22 +1,27 @@
-# Game Project Software 1
 
 Lovecraft-inspired, terminal-based, turn-based RPG written in Python.
 Battle cultists and abominations using melee weapons, firearms with magazines and ammo reserves, and eldritch manifestations that consume Sanity.
 
 ## Features
+- **Narrative-driven gameplay** with chapter-based story progression and player choices
 - Turn-based combat with a clear, colorized combat log
 - Player progression: levels, EXP, HP and Sanity scaling
-- Inventory management with equip/use
-- Weapons and Items system
-  - Melee and firearms
+- Inventory management with equip/use functionality
+- **Weapons and Items system***
+  - Melee and firearms with distinct characteristics
   - Firearms have magazine sizes and use named ammo types
   - Spawn guns with full, empty, or partial magazines
-- Manifestations (skills) that consume Sanity
-- Enemy roster with special attacks and EXP rewards
-- Background music via Pygame (lazy-initialized, safe on machines without audio)
-- Rich-based UI for inventory and status bars with ASCII fallback
+- **Manifestations (skills)** that consume Sanity
+  - Fear, Hope, Rage, and Resentment manifestations available
+  - Each with unique effects and sound effects
+- **Enemy roster** with special attacks and EXP rewards
+  - Multiple difficulty levels and unique abilities
+- **Background music and SFX** via Pygame (lazy-initialized, safe on machines without audio)
+- **Rich-based UI** for inventory and status bars with ASCII fallback
   - Unified Inventory table (aligned columns: `# | Name | Mag | Qty | Description`)
-  - HP/Sanity/EXP bars; ambient cryptic EXP “whispers” appear in the turn log as you near level-up
+  - HP/Sanity/EXP bars; ambient cryptic EXP "whispers" appear in the turn log as you near level-up
+- **Sound effects integration** for weapons, manifestations, and consumables
+- **Typewriter text effects** for immersive storytelling
 
 ## Quick Start
 ### Requirements
@@ -44,7 +49,7 @@ python main.py
 ## Project Structure
 ```
 Game_project_software1/
-├─ main.py                       # Entry point (demo sequence)
+├─ main.py                       # Entry point with story progression and demo encounters
 ├─ Music/                        # Music & SFX assets (case-sensitive on some systems)
 └─ game/
    ├─ __init__.py                # Package API (re-exports: combat, Player, items, enemies, manifestations, music, UI helpers)
@@ -55,6 +60,8 @@ Game_project_software1/
    ├─ manifestations.py          # Manifestation class and library
    ├─ music.py                   # Music helpers (play/stop/set volume, lazy init)
    ├─ player.py                  # Player class and leveling
+   ├─ sfx_loader.py              # Sound effects registration and management
+   ├─ story.py                   # Narrative system and story progression logic
    ├─ ui.py                      # UI helpers: Rich inventory/status bars + ASCII fallbacks
    └─ writing_effects.py         # Typewriter/glitch/etc. text helpers
 ```
@@ -102,12 +109,12 @@ Game_project_software1/
 - File: `game/items.py`
 - Classes: `Item`, `Weapon`, `Consumable`
 - Firearms include:
-  - `ammo_type` (e.g., `.36 Caliber`, `5.56 Caliber`)
+  - `ammo_type` (e.g., `.36 Caliber`, `5.56x45mm NATO`, `4.6x30mm`)
   - `mag_size` (e.g., 6, 30)
   - `current_mag` (auto-filled when acquired)
 - Libraries:
-  - `weapon_library` (e.g., Basic dagger, Old revolver, AR-15)
-  - `consumable_library` (e.g., Karelian pie, Rye Bread, Small coffee, Large coffee, `.36 Caliber`, `5.56x45mm NATO`, `4.6x30mm`)
+  - `weapon_library`: Basic dagger, Sword, Jack's hammer, Old revolver, MP7, AR-15
+  - `consumable_library`: Karelian pie, Rye Bread, Small coffee, Large coffee, .36 Caliber, 5.56x45mm NATO, 4.6x30mm, Markka, Makkara
 - Inventory helpers:
   - `add_weapon_to_inventory(player, name)` (clones a fresh weapon)
   - `add_item_to_inventory(player, name, amount=1)` (routes ammo items into `player.ammo`)
@@ -144,7 +151,7 @@ Game_project_software1/
 
 ### Manifestations
 - File: `game/manifestations.py`
-- Examples: Fear, Rage, Despair (with different costs and effects)
+- Available manifestations: Fear, Hope, Rage, and Resentment (with different costs and effects)
 - SFX field: `sfx_manifest` can be set per manifestation; played when used.
 ### Enemies
 - File: `game/enemies.py`
@@ -156,7 +163,7 @@ Game_project_software1/
 - Simple wrappers: `play_music`, `stop_music`, `set_volume`, `init_audio`
 - Mixer is initialized lazily on first use (or explicitly via `init_audio()`), so import never crashes on machines without audio.
 - Included assets (paths are case-sensitive on some systems):
-  - `Music/ambience/Piano_suspence.mp3`
+  - `Music/ambience/Piano_suspense.mp3`
   - `Music/combat/Anxiety.mp3`
   - `Music/combat/Behind_you.mp3`
   - `Music/SFX/*.wav` (slash, shots, reloads, typing)
@@ -174,14 +181,20 @@ Game_project_software1/
  - Standardized printing: use `ui_print(text, colour=None)` everywhere for consistent Rich/ASCII output.
 
 ## Demo Flow (`main.py`)
-- Creates a player with the `Fear`, `Hope`, `Rage`, and `Resentment` manifestations
-- Gives starter items/weapons (dagger, sword, AR-15, MP7, potions, ammo)
-- Runs two combat encounters
+- Creates a player character with starting manifestations and equipment
+- Runs through a narrative-driven story progression system with multiple chapters ("conduits")
+- Each story segment may unlock new manifestations, equipment, and trigger combat encounters
+- Features typewriter text effects for immersive storytelling
+- Includes multiple combat encounters integrated into the narrative flow
+- Demonstrates the complete game loop: story → combat → progression → story
 - Prints a hint at startup indicating whether Rich UI is enabled or ASCII fallback is in use.
 
-## You can modify the sequence in `main.py` to prototype new encounters or items. Example to add ammo:
-- add_item_to_inventory(player, ".36 Caliber", 12)          # Revolver ammo
-- add_item_to_inventory(player, "5.56x45mm NATO", 30)       # AR-15 ammo
+## Story System (`game/story.py`)
+- Manages narrative progression through chapter-based storytelling
+- Implements player choice mechanics and branching narratives
+- Integrates combat encounters seamlessly into the story flow
+- Uses typewriter effects and timing for dramatic presentation
+- Handles player progression and manifestation unlocks
 
 ## Controls & Tips
 - Choose actions via number keys in combat
