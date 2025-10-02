@@ -7,7 +7,7 @@ from .config import (
     NUM_AIRPORT_CHOICES, NUM_CONDUITS
 )
 from .models import RunState, AirportChoice
-from .repository import fetch_hel, fetch_random_airports_excl_hel
+from .repository import fetch_hel, fetch_random_airports_excl_hel, create_bloody_note
 from .utils.distance import coords, distance_km
 
 # ---- helpers ----
@@ -57,12 +57,15 @@ def start_new_run(seed: int | None = None) -> RunState:
         for i in chosen:
             airports[i].conduit = True
 
+    # Create bloody note with the selected airports
+    bloody_note = create_bloody_note(airports)
+
     state = RunState(
         current_id=hel_id, current_name=hel_name,
         current_iata=hel_iata, current_icao=hel_icao,
         current_country=hel_country, current_lat=hel_lat, current_lon=hel_lon,
         airports=airports,
-        markka=START_MARKKA, sanity=START_SANITY, hp=START_HP
+        markka=START_MARKKA, sanity=START_SANITY, hp=START_HP, inventory=[bloody_note]
     )
     return state
 

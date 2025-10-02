@@ -1,5 +1,5 @@
 # conduit_game/models.py
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Optional
 
 @dataclass
@@ -36,3 +36,13 @@ class RunState:
     markka: int
     sanity: int
     hp: int
+
+    # 10 options
+    airports: List[AirportChoice]
+
+    # Inventory
+    inventory: List[str] = None
+
+    def __post_init__(self):
+        if self.inventory is None:
+            self.inventory = []

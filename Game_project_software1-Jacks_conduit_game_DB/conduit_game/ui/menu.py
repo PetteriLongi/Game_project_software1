@@ -7,7 +7,7 @@ from .travel_board import show_travel_options
 
 
 def show_commands():
-    print("Choose: [1] Travel  [2] Inventory  [3] Rest  [H] Help  [9] Quit")
+    print("Choose: [1] Travel  [2] Inventory  [3] Rest  [H] Help  [Q] Quit")
 
 def show_help():
     print("""
