@@ -37,11 +37,19 @@ def travel_cost(state: RunState, a: AirportChoice) -> Optional[int]:
 
 # ---- core API ----
 def start_new_run(seed: int | None = None) -> RunState:
-    hel_id, hel_name, hel_iata, hel_icao, hel_country, hel_lat, hel_lon = fetch_hel()
+    hel = fetch_hel()
+    hel_id = hel.id
+    hel_name = hel.name
+    hel_iata = hel.iata
+    hel_icao = hel.icao
+    hel_country = hel.country
+    hel_lat = hel.lat
+    hel_lon = hel.lon
+
     rows = fetch_random_airports_excl_hel(NUM_AIRPORT_CHOICES)
 
     airports: list[AirportChoice] = []
-    for r in rows:  # explicit loop to look beginner-friendly
+    for r in rows:
         a = AirportChoice(
             id=r.id, name=r.name, iata=r.iata or "", icao=r.icao or "",
             country=r.country or "", lat=r.lat, lon=r.lon,
@@ -57,7 +65,7 @@ def start_new_run(seed: int | None = None) -> RunState:
         for i in chosen:
             airports[i].conduit = True
 
-    # Create bloody note with the selected airports
+
     bloody_note = create_bloody_note(airports)
 
     state = RunState(
@@ -70,7 +78,7 @@ def start_new_run(seed: int | None = None) -> RunState:
     return state
 
 def rest(state: RunState) -> str:
-    # reset hp + sanity fully
+
     state.hp = START_HP
     state.sanity = START_SANITY
     return "You rest… HP and Sanity fully restored."
@@ -92,7 +100,7 @@ def travel_to_index(state: RunState, idx: int) -> str:
     if state.markka < cost:
         return f"Not enough Markka (need {cost}, have {state.markka})."
 
-    # pay & move
+
     state.markka -= cost
     state.current_id = a.id
     state.current_name = a.name

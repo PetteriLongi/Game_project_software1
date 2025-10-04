@@ -36,6 +36,7 @@ def main():
 if __name__ == "__main__":
     main()
     print("\n\n")
+
     # Color the menu prompt in red + italic
     print(colouring(
         "Choose: [1] Travel  [2] Inventory  [3] Rest  [H] Help  [Q] Quit",
