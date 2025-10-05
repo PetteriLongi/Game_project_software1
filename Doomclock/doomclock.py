@@ -1,12 +1,24 @@
 import sys
 from typing import List, Dict, Callable, Optional
 
+try:  # Prefer unified UI output when available
+    from game.ui_elements.colours import ui_print
+except Exception:  # pragma: no cover - fallback for early bootstrap
+    def ui_print(text: str, colour: Optional[str] = None) -> None:
+        print(text)
+
 # ------------------------------------------------------------
 # Doom Clock (100 → 0)
 # ------------------------------------------------------------
 Log = List[str]
 MilestoneFn = Callable[[dict, list, Log], None]
 OnZeroFn = Callable[[dict, list, Log], None]
+
+
+def _emit_messages(messages: Log) -> None:
+    for message in messages:
+        if message:
+            ui_print(message)
 
 class DoomClock:
     """
@@ -31,8 +43,12 @@ class DoomClock:
                   reason: Optional[str] = None) -> bool:
         prev = self.ticks
         self.ticks = max(0, self.ticks - int(n))
-        if log is not None and reason:
-            log.append(f"\033[95m[Doom -{n}] {reason}\033[0m")
+
+        target_log: Log = log if log is not None else []
+        zero_triggered = False
+
+        if reason:
+            target_log.append(f"\033[95m[Doom -{n}] {reason}\033[0m")
 
         # Fire milestones crossed this tick (e.g., crossing 75 from 76→74)
         for threshold in sorted(self.milestones.keys(), reverse=True):
@@ -40,19 +56,28 @@ class DoomClock:
                 self._hit.add(threshold)
                 cb = self.milestones[threshold]
                 if callable(cb):
-                    cb(player or {}, enemies or [], log or [])
+                    cb(player or {}, enemies or [], target_log)
 
         if not self.resolved and self.ticks == 0:
             self.resolved = True
             if callable(self.on_zero):
-                self.on_zero(player or {}, enemies or [], log or [])
-            return True
-        return False
+                self.on_zero(player or {}, enemies or [], target_log)
+            zero_triggered = True
+
+        if log is None and target_log:
+            _emit_messages(target_log)
+
+        if zero_triggered:
+            sys.exit()
+        return zero_triggered
 
     def add_time(self, n: int = 1, log: Optional[Log] = None, reason: Optional[str] = None):
         self.ticks = min(self.start, self.ticks + int(n))
-        if log is not None and reason:
-            log.append(f"\033[94m[Doom +{n}] {reason}\033[0m")
+        target_log: Log = log if log is not None else []
+        if reason:
+            target_log.append(f"\033[94m[Doom +{n}] {reason}\033[0m")
+        if log is None and target_log:
+            _emit_messages(target_log)
 
     def reset(self):
         self.ticks = self.start
@@ -66,7 +91,6 @@ def on_zero(player, enemies, log):
         "\033[91mTime expires. The conduits yawn wide, tearing the fabric of reality.\n"
         "The world succumbs to an eternal slumber.\033[0m"
     )
-    sys.exit()
 def at_75(player, enemies, log):
     log.append("\033[95m[75] The chanting grows louder; reality shudders.\033[0m")
 
@@ -83,12 +107,11 @@ doom_clock = DoomClock(
     milestones={75: at_75, 50: at_50, 25: at_25},
     on_zero=on_zero
 )
+
 # …then call: combat(player, enemies, doom_clock=doom_clock)
 # make it so that it takes the at25 and so on from the % of the amount in doom clock *
 #for example if the doom clock was 100: 75% would be 75 or if it was 1000 then 25% would be 250 for the event to trigger
 #this makes the code much more reliable and robust
-
-# ==========================================
 # EVENTS / CONDUITS (stubs you can flesh out)
 # ==========================================
 
