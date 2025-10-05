@@ -7,10 +7,11 @@ Usage:
 Quick start:
     from game.player import Player
     from game.enemies import create_enemy
-    
+    from Doomclock.doomclock import doom_clock
+
     player = Player("Hero", unlocked_manifestations=[])
     enemies = [create_enemy("Cultist"), create_enemy("Apostle")]
-    combat(player, enemies)
+    combat(player, enemies, doom_clock)
 
 What this module does:
 - Runs the round-based combat loop
@@ -20,14 +21,9 @@ What this module does:
 - Tracks HP/Sanity and prints a colorized turn log
 
 Rendering (UI):
-- Status bars and inventory UI are rendered by `game/ui.py`.
-  - If Rich is available, uses themed Rich UI (eldritch bars, tables).
-  - Otherwise, falls back to plain-text (ASCII) output.
-
-Inputs and data:
-- Player is an instance of `game.player.Player` (not a dict).
-- Enemies are instances created via `game.enemies.create_enemy(name)`.
-- Weapons/Items live in `game.items`; inventory actions are available from the menu.
+- Status bars, inventory menus, and HUD widgets are delegated to `game/ui.py`.
+  - If Rich is available, the game uses the eldritch Rich layouts.
+  - Otherwise, ASCII fallback utilities from `game/ui_elements/` provide output.
 
 End conditions:
 - Combat ends when all enemies are defeated (victory) or the player HP reaches 0 (defeat).
