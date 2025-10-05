@@ -42,6 +42,9 @@ from .ui import exp_hint, colouring
 from .ui import draw_status_bars_ascii
 from .ui import RICH_AVAILABLE, draw_status_bars_rich
 from .combat_actions import select_target, resolve_attack, handle_manifestations, handle_inventory, reload_gun
+from .ui import display_hud
+from Doomclock.doomclock import doom_clock
+from Database.menu_ui.menu import show_help
 
 # ==========================================
 # MAIN COMBAT LOOP
@@ -50,7 +53,7 @@ from .combat_actions import select_target, resolve_attack, handle_manifestations
 # After certain actions (Attack/Defend/Manifest/Reload), enemies take their turns.
 # Just opening the Inventory and backing out does NOT spend a turn.
 
-def combat(player, enemies_list):
+def combat(player, enemies_list, doom_clock):
     """
     Handles turn-based combat between the player and a list of enemies.
 
@@ -91,11 +94,13 @@ def combat(player, enemies_list):
         # --- Action menu ---
         # Type the number and press Enter to perform an action
         print("\nChoose your action:")
-        print("1. Attack (physical strike)")
-        print("2. Defend (reduce next damage)")
-        print("3. Manifest (use a special skill)")
+        print("1. Attack")
+        print("2. Defend")
+        print("3. Manifest")
         print("4. Inventory")
-        print("5. Reload (for firearms)")
+        print("5. Reload")
+        print("\nH. Help")
+        print("Write: escape to quit")
         choice = input("> ")
 
         # ========================================
@@ -153,6 +158,20 @@ def combat(player, enemies_list):
             player_log.extend(msgs)
 
 
+        # ========================================
+        # PLAYER TURN: HELP
+        # ========================================
+        elif choice.lower() == "h":
+            show_help()
+            continue
+        
+        # ========================================
+        # PLAYER TURN: QUIT
+        # ========================================
+        elif choice.lower() == "escape":
+            print("You ran away from the enemies and got stabbed in the back, coward.")
+            sys.exit()
+        
         # ========================================
         # ENEMY TURNS (only if player action consumed the turn)
         # ========================================
@@ -222,6 +241,12 @@ def combat(player, enemies_list):
         # ========================================
         if turn_consumed and all(e.hp <= 0 for e in enemies_list):
             print(colouring("\nAll enemies have been defeated! Victory is yours!", "green"))
+            if doom_clock is not None:
+                doom_clock.countdown(1, player=None, enemies=None, log=None)
+                try:
+                    display_hud(player, doom_clock)
+                except Exception:
+                    pass
             return True
 
         if turn_consumed:

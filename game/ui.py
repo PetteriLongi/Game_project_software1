@@ -16,6 +16,11 @@ import random
 from .music import play_sfx
 import pygame
 import time
+import shutil
+from Doomclock.doomclock import doom_clock
+from Database.config import USE_ANSI, COLOR_OPEN_CONDUIT, COLOR_CONDUIT_CLOSED, COLOR_VISITED, COLOR_RESET
+from .ui_elements.ASCII_fallback import _render_inventory_ascii, draw_status_bars_ascii, display_hud
+from .ui_elements.colours import ui_print, colorize, colouring, RICH_AVAILABLE, console
 # Detect Rich availability safely here
 try:
     from rich.console import Console
@@ -40,6 +45,8 @@ except Exception:
     box = None      # type: ignore
     console = None
     RICH_AVAILABLE = False
+
+# ==========================================
 
 def level_up_display(player):
     """Level up the player and render a Rich panel (or ASCII fallback) showing gains."""
@@ -73,7 +80,7 @@ def level_up_display(player):
             Text("🔺 ASCENSION COMPLETE 🔺\n", style="bold magenta"),
             Text(f"\nYou have reached Level {player.level}!\n", style="bold green"),
             Text(f"\n+{hp_gain} Maximum HP", style="green"),
-            Text(f"\n+{sanity_gain} Maximum Sanity", style="cyan"),
+            Text(f"\n+{sanity_gain} Maximum Sanity", style="violet"),
             Text(f"\n+{attack_gain} Attack", style="red"),
             Text(f"\n\n{flavor}", style="italic dim"),
         )
@@ -86,10 +93,14 @@ def level_up_display(player):
             padding=(1, 4),
         )
         console.print(panel_level_up)
-        pygame.mixer.music.pause()
-        play_sfx("level_up")
-        time.sleep(1)
-        pygame.mixer.music.unpause()
+        try:
+            if pygame.mixer.get_init():
+                pygame.mixer.music.pause()
+                play_sfx("level_up")
+                time.sleep(1)
+                pygame.mixer.music.unpause()
+        except Exception as e:
+            print(f"[Audio Warning] Level-up SFX failed: {e}")
         console.print(Text("Press Enter to continue...", style="bold magenta"))
         console.input("")
     else:
@@ -115,6 +126,12 @@ def render_inventory(player, weapons_list, consumables_list):
             ammo_str = "\n".join(f"{k}: {v}" for k, v in player.ammo.items())
         else:
             ammo_str = "(none)"
+
+        markka_amount = getattr(player, "markka", 0)
+        try:
+            markka_display = f"{markka_amount:,}"
+        except ValueError:
+            markka_display = str(markka_amount)
 
         # Unified Table
         items_table = Table(
@@ -157,8 +174,17 @@ def render_inventory(player, weapons_list, consumables_list):
             index += 1
 
         # Panel with header and ammo reserves
+        inventory_header = Text()
+        inventory_header.append("Inventory", style="bold magenta")
+        inventory_header.append("\n")
+
+        inventory_header.append(f"Markka: {markka_display}", style="yellow")
+        inventory_header.append("\n")
+        inventory_header.append("Ammo reserves\n", style="cyan")
+        inventory_header.append(ammo_str, style="cyan")
+
         panel_inventory = Panel.fit(
-            Text.assemble(Text("Inventory", style="bold magenta"), "\n", Text(f"Ammo reserves\n{ammo_str}", style="cyan")),
+            inventory_header,
             box=box.SQUARE,
             border_style="magenta"
         )
@@ -170,7 +196,53 @@ def render_inventory(player, weapons_list, consumables_list):
             border_style="magenta"
         )
 
-        console.print(Columns([panel_inventory, panel_level], equal=True))
+        # Doom clock progress bar panel
+        def create_doom_bar(doom_clock):
+            total = doom_clock.start
+            remaining = doom_clock.ticks
+            percentage = remaining / total if total > 0 else 0
+
+            # Create a simple progress bar
+            bar_width = 15
+            filled = int(bar_width * percentage)
+            empty = bar_width - filled
+
+            bar_text = "█" * filled + "░" * empty
+            percent_text = f"{percentage*100:.1f}%"
+
+            return Text.assemble(
+                Text("Doom Clock\n", style="bold red"),
+                Text(f"[{bar_text}] {percent_text}", style="cyan")
+            )
+
+        panel_doom = Panel.fit(
+            create_doom_bar(doom_clock),
+            box=box.SQUARE,
+            border_style="magenta"
+        )
+
+        # Vitals panel between inventory and level
+        vitals_text = Text()
+        vitals_text.append("Vitals", style="bold magenta")
+        vitals_text.append("\n")
+
+        hp_bar_text = _rich_bar_text(player.hp, player.max_hp, kind="hp") if getattr(player, "max_hp", 0) else Text("N/A")
+        vitals_text.append("HP\n", style="green")
+        vitals_text += hp_bar_text
+        vitals_text.append(f"  {player.hp}/{player.max_hp}\n", style="green")
+
+        san_bar_text = _rich_bar_text(player.sanity, player.max_sanity, kind="sanity") if getattr(player, "max_sanity", 0) else Text("N/A")
+        vitals_text.append("Sanity\n", style="violet")
+        vitals_text += san_bar_text
+        vitals_text.append(f"  {player.sanity}/{player.max_sanity}", style="violet")
+
+        panel_vitals = Panel.fit(
+            vitals_text,
+            box=box.SQUARE,
+            border_style="magenta"
+        )
+
+        console.print(Columns([panel_inventory, panel_vitals, panel_level, panel_doom], equal=True))
         console.print()  # spacer
 
         # Print the unified table 
@@ -179,88 +251,7 @@ def render_inventory(player, weapons_list, consumables_list):
         console.print(Text("Type 'u' to unequip current weapon", style="dim cyan"))
     else:
         _render_inventory_ascii(player, weapons_list, consumables_list)
-
-
-# ==========================================
-# INVENTORY RENDERING (ASCII FALLBACK)
-# ==========================================
-def _render_inventory_ascii(player, weapons_list, consumables_list):
-    """Plain-text inventory rendering used when Rich is unavailable.
-
-    Matches ordering and numbering expected by combat_actions.handle_inventory().
-    """
-    print("\n=== Inventory ===")
-
-    # Ammo reserves
-    print("Ammo reserves:")
-    if getattr(player, "ammo", None):
-        for k, v in player.ammo.items():
-            print(f"  - {k}: {v}")
-    else:
-        print("  (none)")
-
-    index = 1
-    # Weapons section
-    print("\nWeapons:")
-    if weapons_list:
-        for w in weapons_list:
-            equipped = (player.weapon is w)
-            badge = " (equipped)" if equipped else ""
-            if getattr(w, "weapon_type", "melee") == "gun":
-                mag = f" [{w.current_mag}/{w.mag_size}]"
-            else:
-                mag = ""
-            print(f"  {index}. {w.name}{badge}{mag} - {w.description}")
-            index += 1
-    else:
-        print("  (none)")
-
-    # Consumables section
-    print("\nConsumables:")
-    if consumables_list:
-        for c in consumables_list:
-            qty = getattr(c, "quantity", None)
-            qty_str = f" x{qty}" if isinstance(qty, int) else ""
-            print(f"  {index}. {getattr(c, 'name', str(c))}{qty_str} - {getattr(c, 'description', '')}")
-            index += 1
-    else:
-        print("  (none)")
-
-    print("\n0. Back to action menu")
-    print("Type 'u' to unequip current weapon")
-    print("Choose an item to equip/use (0 to back):")
-
-
-# ========================================
-# COLOUR HANDLING
-# ========================================
-
-COLOURS = {
-    "red": "\033[91m",
-    "green": "\033[92m",
-    "yellow": "\033[93m",
-    "blue": "\033[94m",
-    "purple": "\033[95m",
-    "magenta": "\033[95m",
-    "cyan": "\033[96m",
-    "white": "\033[97m",
-    "reset": "\033[0m"
-}
-
-def colouring(text, colour):
-    return f"{COLOURS[colour]}{text}{COLOURS['reset']}"
-
-def ui_print(text: str, colour: str | None = None):
-    if RICH_AVAILABLE and console is not None:
-        if colour:
-            console.print(Text(str(text), style=colour))
-        else:
-            console.print(str(text))
-    else:
-        if colour:
-            print(colouring(str(text), colour))
-        else:
-            print(str(text))
+        
 
 # ==========================================
 # COMBAT STATUS BARS (RICH)
@@ -325,7 +316,7 @@ def _rich_bar_text(current, maximum, bar_length=20, kind="hp"):
                 style = "bold red"
         elif kind == "sanity":
             # Eldritch vibe for Sanity
-            style = "bold magenta"
+            style = "bold violet"
         elif kind == "xp":
             style = "bold purple"
         else:
@@ -360,7 +351,7 @@ def draw_status_bars_rich(player, enemies_list):
         )
     )
     # Thin eldritch separator between HP and Sanity
-    left.add_row(Text(""), Text(" ", style="dim magenta"))
+    left.add_row(Text(""), Text(" ", style="dim violet"))
 
     san_bar = _rich_bar_text(player.sanity, player.max_sanity, kind="sanity")
     left.add_row(
@@ -385,7 +376,6 @@ def draw_status_bars_rich(player, enemies_list):
         )
     )
 
-
     # Right column: one row per enemy
     right = Table.grid(padding=(0, 1))
     for idx, enemy in enumerate(enemies_list):
@@ -408,48 +398,3 @@ def draw_status_bars_rich(player, enemies_list):
 
     table.add_row(left, right)
     console.print(table)
-
-# ==========================================
-# COMBAT STATUS BARS (ASCII FALLBACK)
-# ==========================================
-def draw_status_bars_ascii(player, enemies_list):
-    """Print classic ASCII status bars for player and enemies.
-
-    Mirrors the original layout from combat.py, used when Rich is unavailable.
-    """
-    # Determine max name width for alignment on the right side
-    max_name_length = max(len(e.name) for e in enemies_list) if enemies_list else 12
-
-    def draw_bar(label, current, maximum, bar_length=20, color="default", name_width=12):
-        ratio = current / maximum if maximum > 0 else 0
-        filled = int(ratio * bar_length)
-        empty = bar_length - filled
-        if color == 'hp':
-            col = '\033[92m' if ratio > 0.6 else '\033[93m' if ratio > 0.3 else '\033[91m'
-        elif color == 'sanity':
-            col = '\033[94m'
-        else:
-            col = '\033[0m'
-        reset = '\033[0m'
-        bar = f"{col}{'#' * filled}{'-' * empty}{reset}"
-        return f"{label:<{name_width}}: [{bar}] {current}/{maximum}"
-
-    # Build enemy bars
-    enemy_bars = []
-    for enemy in enemies_list:
-        if enemy.hp > 0:
-            enemy_bars.append(draw_bar(enemy.name, enemy.hp, enemy.max_hp, color='hp', name_width=max_name_length))
-        else:
-            enemy_bars.append(f"{enemy.name}: [\033[91mDEFEATED\033[0m]")
-
-    player_lines = 2  # HP + Sanity
-    total_lines = max(len(enemy_bars), player_lines)
-
-    for i in range(total_lines):
-        left = (
-            draw_bar("Your HP", player.hp, player.max_hp, color="hp") if i == 0 else
-            draw_bar("Sanity ", player.sanity, player.max_sanity, color="sanity") if i == 1 else
-            " " * 42
-        )
-        right = enemy_bars[i] if i < len(enemy_bars) else ""
-        print(f"{left:<40} || {right}")

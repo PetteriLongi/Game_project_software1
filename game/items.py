@@ -96,9 +96,26 @@ class Consumable(Item):
         else:
             return f"\033[91mYou have no {self.name} left!\033[0m"
 
+class LoreItem(Item):
+    """
+    Represents a lore item, like a note or a book.
+    Inherits from Item but adds quantity tracking.
+    """
+    def __init__(self, name, description, text):
+        super().__init__(name, description)
+        self.text = text
+    
+    def display_text(self):
+        return self.text
+
+    def use(self, player):
+        return self.display_text()
+
+
 # ==========================================
 # Functions to add items or weapons to inventory
 # ==========================================
+
 
 def add_weapon_to_inventory(player, weapon_name, current_mag=None):
     """
@@ -236,7 +253,6 @@ consumable_library = {
     "pistol ammo": Consumable(".36 Caliber", "Revolver ammunition.", effect=None, quantity=0, type="ammo"),
     "rifle ammo": Consumable("5.56x45mm NATO", "Rifle ammunition.", effect=None, quantity=0, type="ammo"),
     "submachine ammo": Consumable("4.6x30mm", "Submachine gun ammunition.", effect=None, quantity=0, type="ammo"),
-    "Markka": Consumable("Markka", "A markka is a unit of currency in Finland", effect=None, quantity=0),
     "Makkara": Consumable("Makkara", "A makkara is a unit of currency in Finland. Wait what?!?", effect=lambda player: heal_hp(player, 100) + restore_sanity(player, 100), quantity=0, sfx_name="Eating"),
     # Additional items like antidotes, elixirs, etc., can be added here
 }

@@ -7,15 +7,14 @@ from .player import Player
 from .manifestations import manifestation_library
 from .items import add_weapon_to_inventory, add_item_to_inventory
 from .music import play_music
+from .ui import display_hud
+from Doomclock.doomclock import doom_clock
 
-# One-time fast-forward flag for the intro narration only
-INTRO_FAST = False
 
 # Utility Functions
 def slow_print(text):
 #    """Print text slowly for immersion."""
-    # Use a one-time skip-all only if INTRO_FAST is enabled. Otherwise default behavior.
-    print_typewriter(text + "\n", force_skip_all=INTRO_FAST)
+    print_typewriter(text + "\n")
 #    for char in text:
 #        sys.stdout.write(char)
 #        sys.stdout.flush()
@@ -44,31 +43,27 @@ def make_choice(options):
 
 # Story Functions
 def intro():
-    # Offer one-time option to fast-forward the intro narration only
-    global INTRO_FAST
-    try:
-        opt = input("\n[Press Enter to fast-forward intro narration, or type anything to read it slowly] ")
-    except Exception:
-        opt = ""
-    INTRO_FAST = (opt.strip() == "")
-    slow_print("=== Chapter I: Crimson Veil ===\n")
-    slow_print("Arrival at Helsinki Airport...")
-    slow_print("The plane lands with a shudder that rattles your molars...")
-    slow_print("You step into Helsinki Airport, your footsteps echoing against marble where a hundred others should drown them out...")
-    flicker_line("The digital departure board flickers,")
-    slow_print("numbers dissolving into static before reassembling.")
-    slow_print("A janitor's cart sits abandoned mid-corridor, mop water gone still as glass.")
-    flicker_line("Ceiling lights buzz and dim in sequence")
-    slow_print("Casting your shadow in three directions at once.")
-    slow_print("A child's forgotten teddy bear watches you from a bench with eyes that seem to follow.")
+    slow_print("""=== Chapter I: Crimson Veil ===\n
+    Arrival at Helsinki Airport...
+    The plane lands with a shudder that rattles your molars...
+    You step into Helsinki Airport, your footsteps echoing against marble where a hundred others should drown them out...
+
+    The digital departure board flickers,
+    numbers dissolving into static before reassembling.
+
+    A janitor's cart sits abandoned mid-corridor, mop water gone still as glass.
+    Ceiling lights buzz and dim in sequence.
+    Casting your shadow in three directions at once.
+    A child's forgotten teddy bear watches you from a bench with eyes that seem to follow.""")
     wait_for_input()
     dark_hallway()
 
 def dark_hallway():
-    slow_print("A corridor stretches ahead, marked 'Terminal' in faded letters...")
-    slow_print("Your footsteps echo against tile, then suddenly stop—sound swallowed mid-step.")
-    slow_print("Twenty feet in, the fluorescent lights end abruptly, leaving a wall of black.")
-    slow_print("You squint, but can't make out even the outline of walls beyond—just absence where substance should continue.")
+    slow_print("""    A corridor stretches ahead, marked 'Terminal' in faded letters...
+
+    Your footsteps echo against tile, then suddenly stop—sound swallowed mid-step.
+    Thirteen meters in, the fluorescent lights end abruptly, leaving a wall of black.
+    You squint, but can't make out even the outline of walls beyond—just absence where substance should continue.""")
     wait_for_input()
     hallway_decision()
 
@@ -85,45 +80,49 @@ def hallway_decision():
             slow_print("Fate loops you back — you cannot escape this path.")
 
 def where_shadows_bled():
-    slow_print("You step into the black hallway.")
-    slow_print("The temperature plummets ten degrees.")
-    slow_print("Your lungs strain against air thick as oil.")
-    slow_print("Twenty paces in, your shoe squelches in something wet")
-    slow_print("dark liquid pooling around a crumpled form.")
-    slow_print("Then your eyes adjust.")
-    slow_print("Bodies. Dozens of them.")
-    slow_print("Robes torn, faces twisted, their blood soaking the tiles in black-red rivers.")
-    slow_print("Some still clutch ritual knives, others lie broken at unnatural angles, their expressions frozen in silent hymns cut short.")
-    slow_print("Too many to count.")
-    slow_print("Too many for one man to face.")
-    slow_print("And yet, amid the ruin, one still breathes.")
+    slow_print("""    You step into the black hallway.
+    The temperature plummets ten degrees.
+    Your lungs strain against air thick as oil.
+
+    Thirteen paces in, your shoe squelches in something wet
+    dark liquid pooling around a crumpled form.
+    Then your eyes adjust.
+
+    Bodies. Dozens of them.
+    Robes torn, faces twisted, their blood soaking the tiles in black-red rivers.
+    Some still clutch ritual knives, others lie broken at unnatural angles, their expressions frozen in silent hymns cut short.
+    Too many to count.
+    Too many for one man to face.
+
+    And yet, amid the ruin, one still breathes.""")
     wait_for_input()
-    conduit()            
+    encounter_with_man()            
 
 def encounter_with_man():
-    slow_print("A hand shoots out, fingers trembling, smearing crimson across your wrist.")
-    slow_print("Beneath a torn cassock, chest wounds bubble with each labored breath.")
-    slow_print("Yellowed eyes, bloodshot and dilated, find yours with unsettling precision.")
-    slow_print("The grip tightens—impossibly strong for someone losing so much blood.")
-    slow_print("\"I… am Ezekiel,\" escapes through teeth stained red.")
-    slow_print("\"Warden of the Threshold… protector of this world…\"")
+    slow_print("""    A hand shoots out, fingers trembling, smearing crimson across your wrist.
+    Beneath a torn cassock, chest wounds bubble with each labored breath.
+    Yellowed eyes, bloodshot and dilated, find yours with unsettling precision.
+
+    The grip tightens—impossibly strong for someone losing so much blood.
+    \"I… am Ezekiel,\" escapes through teeth stained red.
+    \"Warden of the Threshold… protector of this world…\"""")
     wait_for_input()
     conduit()
 
 def conduit():
-    slow_print("Beside the Warden you see it.")
-    slow_print("Not a machine. Not a sculpture.")
-    slow_print("A wound in geometry itself,")
-    slow_print("its angles folding inward and outward at once.")
-    slow_print("   ")
-    slow_print("It hums with a resonance that bypasses your ears,")
-    slow_print("vibrating directly in your bones.")
-    slow_print("Light and shadow pulse across its surface,")
-    slow_print("alive in ways your mind refuses to parse.")
-    slow_print("   ")
-    slow_print("Ezekiel coughs, blood spattering across your sleeve.")
-    slow_print("on His grip your wrist is iron.")
-    slow_print('"You must… shut it down. Touch it… before it opens fully..."')
+    slow_print("""    Beside the Warden you see it.
+    Not a machine. Not a sculpture.
+    A wound in geometry itself,
+    its angles folding inward and outward at once.
+       
+    It hums with a resonance that bypasses your ears,
+    vibrating directly in your bones.
+    Light and shadow pulse across its surface,
+    alive in ways your mind refuses to parse.
+       
+    Ezekiel coughs, blood spattering across your sleeve.
+    on His grip your wrist is iron.
+    \"You must… shut it down. Touch it… before it opens fully...\"""")
     wait_for_input()
     first_conduit_decision()
 
@@ -140,98 +139,105 @@ def first_conduit_decision():
             slow_print('Ezekiel gasps: "You MUST close it... or all is lost!"')
 
 def awakening():
-    slow_print("Your palm meets the surface....")
-    slow_print("It is not solid. It is not liquid.")
-    slow_print("It is wrong.")
-    slow_print("  ")
-    slow_print("Agony detonates behind your eyes.")
-    slow_print("Visions of stars that should not exist burn themselves into your sight.")
-    slow_print("Something vast — something ancient — swivels its awareness toward you.")
-    slow_print("   ")
-    slow_print("The conduit collapses in on itself,")
-    slow_print("a scream of light imploding into silence.")
-    slow_print("   ")
-    slow_print("You fall to your knees")
-    slow_print("Lungs full of knives")
-    slow_print("vision nattowed to a tunnel of shadows and pulse.")
-    slow_print("it's not pain. it's not death. it's the knowing.")
-    slow_print("That i'ts too much.")
-    slow_print("That you were never meant to carry this.")
-    slow_print("That some things were never meant to be seen")
-    slow_print("And then, like a cord snapping inside your chest, it happens.")
-    slow_print("something flees you.")
-    slow_print("Not bravery. Not strength.")
-    slow_print("Fear.")
-    slow_print("The trembling you buried beneath decisions,")
-    slow_print("the dread you swallowed to keep moving, rips loose.")
-    slow_print("Not forced but freed, as if your mind could no longer hold the weight of its silence.")
-    slow_print("It does not vanish. It recoils.")
-    slow_print("The air folds around the absence like shivering cloth,")
-    slow_print("and from it emerges a shape, twitching, angular, impossible to watch directly.")
-    slow_print("It watches everything. It breathes in hesitation. it pulses with retreat.")
-    slow_print("It waits.")
-    slow_print("Not to defend you, but to outlive what breaks you.")
-    slow_print("[MANIFESTATION UNLOCKED: **Fear**]")
-    slow_print("It does not protect. It does not empower.")
-    slow_print("But it will follow until your shadow forgets the sun.")
-    slow_print("And in this place...")
-    slow_print("That is enough to shape reality.")
+    slow_print("""    Your palm meets the surface....
+    It is not solid. It is not liquid.
+    It is wrong.
+    
+    Agony detonates behind your eyes.
+    Visions of stars that should not exist burn themselves into your sight.
+    Something vast, something ancient, swivels its awareness toward you.
+    
+    The conduit collapses in on itself,
+    a scream of light imploding into silence.
+    
+    You fall to your knees
+    Lungs full of knives
+    vision narrowed to a tunnel of shadows and pulse.
+
+    It's not pain. It's not death. It's the knowing.
+    That it's too much.
+    That you were never meant to carry this.
+    That some things were never meant to be seen.
+
+    Then, like a cord snapping inside your chest, it happens.
+    Something flees you.
+    Not bravery. Not strength.
+    Fear.
+
+    The trembling you buried beneath decisions,
+    the dread you swallowed to keep moving, rips loose.
+    Not forced but freed, as if your mind could no longer hold the weight of its silence.
+    It does not vanish. It recoils.
+
+    The air folds around the absence like shivering cloth,
+    and from it emerges a shape, twitching, angular, impossible to watch directly.
+    It watches everything. It breathes in hesitation. it pulses with retreat.
+    It waits.
+
+    Not to defend you, but to outlive what breaks you.
+    [MANIFESTATION UNLOCKED: **Fear**]
+    It does not protect. It does not empower.
+    But it will follow until your shadow forgets the sun.
+
+    And in this place...
+    That is enough to shape reality.""")
+    doom_clock.countdown(1, player=None, enemies=None, log=None, reason="Conduit closure ripples time.")
     wait_for_input()
     shadows_stir()
 
 def shadows_stir():
-    slow_print("Ezekiel’s head lolls back,")
-    slow_print("but a faint smile clings to his ruined face.")
-    slow_print("   ")
-    slow_print("Good... you succeeded...")
-    slow_print("    ")
-    slow_print("His voice trembles on the edge of nothing.")
-    slow_print("    ")
-    slow_print("The air shifts.")
-    slow_print("Where the conduit’s radiance once screamed,")
-    slow_print("the shadows now stretch unnaturally long,")
-    slow_print("sliding into cracks and corners where no light should reach.")
-    slow_print("For the first time in hours — maybe days —")
-    slow_print("daylight filters faintly into the hallway.")
-    slow_print("     ")
-    slow_print("But peace does not follow.")
-    slow_print("     ")
-    slow_print("A figure bursts from the broken light.")
-    slow_print("Cloth robes of black and tattered crimson drape across its frame,")
-    slow_print("etched with curling sigils that writhe like living things.")
-    slow_print("Chains dangle from its sleeves, rattling in rhythm")
-    slow_print("to the low hum of a hymn that never passes its lips.")
-    slow_print("The hood slips back, revealing a face locked in rage — veins bulging, eyes fever-bright,")
-    slow_print("mouth twisted as if reciting verses too terrible for sound.")
-    slow_print("    ")
-    slow_print("A cultist of the Hymn of the Old Ones.")
-    slow_print("   ")
-    slow_print("It sees you. And it moves.")
+    slow_print("""    Ezekiel’s head lolls back,")
+    but a faint smile clings to his ruined face.
+    
+    \"Good... you succeeded...\"
+    
+    His voice trembles on the edge of nothing.
+    
+    The air shifts.
+    Where the conduit’s radiance once screamed,
+    the shadows now stretch unnaturally long,
+    sliding into cracks and corners where no light should reach.
+    For the first time in hours, maybe days 
+    daylight filters faintly into the hallway.
+    
+    But peace does not follow.
+    
+    A figure bursts from the broken light.
+    Cloth robes of black and tattered crimson drape across its frame,
+    etched with curling sigils that writhe like living things.
+    Chains dangle from its sleeves, rattling in rhythm
+    to the low hum of a hymn that never passes its lips.
+    The hood slips back, revealing a face locked in rage — veins bulging, eyes fever-bright,
+    mouth twisted as if reciting verses too terrible for sound.
+    
+    A cultist of the Hymn of the Old Ones.
+    
+    It sees you. And it moves.""")
     wait_for_input()
     ezekiels_warning()
 
 def ezekiels_warning():
-    slow_print("Before the zealot can close the distance, Ezekiel rasps,")
-    slow_print("a sudden force behind his fading voice:")
-    slow_print('"You must endure yet another hurdle. But fear not… I will guide you."')
-    slow_print("   ")
-    slow_print("His bloodied hand trembles as he points at your chest.")
-    slow_print("   ")
-    slow_print('"The conduit marked you. You carry within you.... manifestations.')
-    slow_print("Powers pulled from knowledge that no mind should touch.")
-    slow_print("I cannot see what gift has taken root first —")
-    slow_print("but know this: each manifestation draws on your sanity.")
-    slow_print("Spend too much, and you will lose yourself.")
-    slow_print('Spend wisely, and you will survive."')
-    slow_print("  ")
-    slow_print("His words linger, as though pressed into your skull itself.")
+    slow_print("""    Before the zealot can close the distance, Ezekiel rasps,
+    a sudden force behind his fading voice:
+    "You must endure yet another hurdle. But fear not… I will guide you."
+    
+    His bloodied hand trembles as he points at your chest.
+    
+    \"The conduit marked you. You carry within you.... manifestations.\"
+    \"Powers pulled from knowledge that no mind should touch.\"
+    \"I cannot see what gift has taken root first\"
+    \"but know this: each manifestation draws on your sanity.\"
+    \"Spend too much, and you will lose yourself.\"
+    \"Spend wisely, and you will survive.\"
+    
+    His words linger, as though pressed into your skull itself.""")
     wait_for_input()
     combat_scene()
 
 def combat_scene():
-    slow_print("⚔ Combat Tutorial ⚔")
-    slow_print("Ezekiel's voice steadies you: \"This one is weak. Learn quickly.\"")
-    slow_print("I'll show you how to act in battle: Attack, Defend, Manifest, Inventory, and Reload.")
+    slow_print("""    ⚔ Combat Tutorial ⚔")
+    Ezekiel's voice steadies you: \"This one is weak. Learn quickly.\"
+    I'll show you how to act in battle: Attack, Defend, Manifest, Inventory, and Reload.""")
 
     tutorial_player = Player("You", unlocked_manifestations=[manifestation_library["Fear"]])
     
@@ -245,59 +251,56 @@ def combat_scene():
     except Exception:
         # If the track is missing, it's fine to continue silently
         pass
-    slow_print("Ezekiel: First, equip a weapon from your inventory.")
-    slow_print("Then try a simple Attack. Choose a target and strike.")
-    slow_print("You can also Defend to halve the next hit, or open Inventory to use a potion.")
-    slow_print("And the power within you — Manifest — spends sanity for stronger effects.")
-    slow_print("Reload is only relevant if you're using a firearm.")
+    slow_print("""    Ezekiel: \"First, equip a weapon from your inventory.\"
+    \"Then try a simple Attack. Choose a target and strike.\"
+    \"You can also Defend to halve the next hit, or open Inventory to use a potion.\"
+    \"And the power within you — Manifest — spends sanity for stronger effects.\"
+    \"Reload is only relevant if you're using a firearm.\"""")
     wait_for_input()
 
     # Spawn a simple enemy for practice
     enemies = [create_enemy("Tutorial")]
 
     # Run the real combat loop
-    run_combat(tutorial_player, enemies)
+    run_combat(tutorial_player, enemies, doom_clock)
 
-    slow_print("Ezekiel: \"Good. You grasp the rhythm — act, endure, and press on.\"")
+    slow_print("\"Good. You grasp the rhythm — act, endure, and press on.\"")
     wait_for_input()
     aftermath()
 
 def aftermath():
-    slow_print("The cultist crumples to the ground, robes pooling like spilled ink...")
-    slow_print("The hymn dies in its throat, leaving only the sound of your heartbeat and Ezekiel’s wheezing breath.")
-    slow_print("   ")
-    slow_print("The corridor is quiet again,")
-    slow_print("but your hands tremble — from exertion, from power,")
-    slow_print("from something you can no longer deny is inside you.")
-    slow_print("   ")
-    slow_print("Ezekiel watches, weak eyes gleaming faintly.")
-    slow_print('"Yes… you see now. You have survived.')
-    slow_print('But survival is only the beginning."')
+    slow_print("""    The cultist crumples to the ground, robes pooling like spilled ink...
+    The hymn dies in its throat, leaving only the sound of your heartbeat and Ezekiel’s wheezing breath.
+    
+    The corridor is quiet again,
+    but your hands tremble — from exertion, from power,
+    \"from something you can no longer deny is inside you.\"
+    
+    Ezekiel watches, weak eyes gleaming faintly.
+    \"Yes… you see now. You have survived.\"
+    \"But survival is only the beginning.\"""")
     wait_for_input()
     final_words()
 
 def final_words():
-    slow_print("His body convulses with another cough, crimson flecking his lips.")
-    slow_print("Still, he forces the words out, urgent and deliberate:")
-    slow_print("  ")
-    slow_print('"You must continue my work.')
-    slow_print("The conduits… they are at airports across the world.")
-    slow_print('Only you can close them now...."')
-    slow_print("    ")
-    slow_print("He presses a crumpled, blood-stained note into your palm.")
-    slow_print("Scribbled names of airports, written in haste, blur beneath smears of red.")
-    slow_print("  ")
-    slow_print("His grip slackens.")
-    slow_print("With a final ragged breath,")
-    slow_print("Ezekiel collapses into silence.")
-    slow_print("    ")
-    slow_print("The hallway feels colder without his voice.")
-    slow_print("And in your hand, the note feels heavier than paper has any right to be.")
-    slow_print("")
+    slow_print("""    His body convulses with another cough, crimson flecking his lips.
+    Still, he forces the words out, urgent and deliberate:
+    
+    \"You must continue my work.\"
+    \"The conduits… they are at airports across the world.\"
+    \"Only you can close them now....\"
+
+    He presses a crumpled, blood-stained note into your palm.
+    Scribbled names of airports, written in haste, blur beneath smears of red.
+
+    His grip slackens.
+    With a final ragged breath,
+    Ezekiel collapses into silence.
+
+    The hallway feels colder without his voice.
+    And in your hand, the note feels heavier than paper has any right to be.""")
     wait_for_input()
     #end_game()
-# Reset to normal behavior after the intro narration
-INTRO_FAST = False
 
 #def end_game():
 #    slow_print("GAME OVER – or perhaps just the beginning...")
@@ -357,7 +360,8 @@ def run_combat_spec(spec, player):
         try: play_music(track, volume=0.12)
         except Exception: pass
     enemies = [create_enemy(n) for n in spec.get("enemies", [])]
-    run_combat(player, enemies)
+    # Pass a provided doom_clock if present in spec, otherwise fall back to the module-level doom_clock
+    run_combat(player, enemies, spec.get("doom_clock") or doom_clock)
 
 def run_story(start_key, player, story_map, print_line, wait_for_input, make_choice_func):
     key = start_key
@@ -388,7 +392,16 @@ def run_story(start_key, player, story_map, print_line, wait_for_input, make_cho
             wait_for_input()
         # 2) Combat (optional)
         run_combat_spec(node.get("combat"), player)
-        # 3) Choices (optional)
+
+        # 3) Doom Clock
+        if "doom_tick" in node:
+            doom_clock.countdown(
+                node["doom_tick"],
+                reason=node.get("doom_reason", "As the conduit closes so does time..."),
+            )
+            display_hud(player, doom_clock)
+
+        # 4) Choices (optional)
         choices = node.get("choices")
         if choices:
             labels = [c.get("label", "...") for c in choices]
@@ -397,7 +410,7 @@ def run_story(start_key, player, story_map, print_line, wait_for_input, make_cho
             idx = max(1, min(sel, len(choices))) - 1
             key = choices[idx].get("next")
             continue
-        # 4) Goto / end
+        # 5) Goto / end
         next_key = node.get("goto") or node.get("next")
         if node.get("quit"):
             print_line("[The story concludes. Exciting...]")
@@ -412,26 +425,26 @@ STORY_MAP = {
         "music": {"action": "play", "track": "Music/ambience/Tension_rise.mp3", "volume": 0.12, "loop": True},
         "text": [
             """\n=== Chapter II: Echoes of the Abyss ===\n\n
-The journey leaves you hollow. Another airport.
-Another silence where life should be.
-But this time it isn’t empty.
+    The journey leaves you hollow. Another airport.
+    Another silence where life should be.
+    But this time it isn’t empty.
 
-Figures linger ahead, robes shifting like shadow and blood.
-Their chants rise and fall, a hymn that claws at your skin.
+    Figures linger ahead, robes shifting like shadow and blood.
+    Their chants rise and fall, a hymn that claws at your skin.
 
-Most you recognize, the same cultists who fell in Helsinki.
-But one stands apart.
-A heavy tome rests in his hands,
-its pages breathing with symbols that squirm like insects across the paper.
+    Most you recognize, the same cultists who fell in Helsinki.
+    But one stands apart.
+    A heavy tome rests in his hands,
+    its pages breathing with symbols that squirm like insects across the paper.
 
-When he speaks the air itself seems to recoil.
+    When he speaks the air itself seems to recoil.
 
-\"I am an Apostle of the Hymn\"
+    \"I am an Apostle of the Hymn\"
 
-His eyes narrow, fixing you with disbelief.
+    His eyes narrow, fixing you with disbelief.
 
-\"What business does a stray civilian have here?\"
-\"How did you breach the veil?\"\n""",
+    \"What business does a stray civilian have here?\"
+    \"How did you breach the veil?\"\n""",
         ],
         "wait": True,
         "choices": [
@@ -448,31 +461,31 @@ His eyes narrow, fixing you with disbelief.
 # === SECOND CONDUIT DOUBT ===
     "second_conduit.doubt": {
         "text": [
-            """You steady your breath and speak not with certainty,
-but with something stranger: conviction borrowed from the terror behind your eyes.
+            """    You steady your breath and speak not with certainty,
+    but with something stranger: conviction borrowed from the terror behind your eyes.
 
-\"The Hymn called to me,\" you say.
+    \"The Hymn called to me,\" you say.
 
-The Apostle flinches, almost imperceptibly.
-Behind him, the cultists falter in their chant, their rhythm bending like warped vinyl.
-The air thickens.
-You step forward.
+    The Apostle flinches, almost imperceptibly.
+    Behind him, the cultists falter in their chant, their rhythm bending like warped vinyl.
+    The air thickens.
+    You step forward.
 
-\"I dreamed the ink before I saw the page.
+    \"I dreamed the ink before I saw the page.
 
-I heard the name that hides between syllables.
+    I heard the name that hides between syllables.
 
-I walked the corridors that pulse beneath waking thought.\"
+    I walked the corridors that pulse beneath waking thought.\"
 
-The Apostle watches. Measuring.
-Somewhere behind his gaze, a calculus unfolds — ancient, inhuman, suspicious.
-Then, slowly, he lowers the tome.
+    The Apostle watches. Measuring.
+    Somewhere behind his gaze, a calculus unfolds — ancient, inhuman, suspicious.
+    Then, slowly, he lowers the tome.
 
-\"If that were true… then the Hymn has changed its key.\""
+    \"If that were true… then the Hymn has changed its key.\""
 
-A pause.
+    A pause.
 
-\"Perish knave.\""""
+    \"Perish knave.\""""
         ],
         "wait": True,
         "next": "second_conduit.attack"
@@ -507,43 +520,43 @@ his book closing with a sound like bone breaking.
         "music": {"action": "play", "track": "Music/ambience/Tension_rise.mp3", "volume": 0.12, "loop": True},
         "text": [
             """=== The Whispering Conduit ===
-You draw closer to the conduit.  
-The air thickens.  
-Each step drags against unseen weight.  
-Whispers.  
-Not sound, but intrusion.  
-A pressure that seeps into the marrow,  
-curling around thought and dream alike.  
-They flood your skull in a tongue not meant for man
-and yet, you *understand*.  
+    You draw closer to the conduit.  
+    The air thickens.  
+    Each step drags against unseen weight.  
+    Whispers.  
+    Not sound, but intrusion.  
+    A pressure that seeps into the marrow,  
+    curling around thought and dream alike.  
+    They flood your skull in a tongue not meant for man
+    and yet, you *understand*.  
 
-A presence. Vast. Ancient.  
-It does not speak *to* you, but *around* you,  
-as though idly acknowledging a gnat that landed in its shadow.  
+    A presence. Vast. Ancient.  
+    It does not speak *to* you, but *around* you,  
+    as though idly acknowledging a gnat that landed in its shadow.  
 
-\"...a hand that should not reach, reaches.\"  
-\"...an eye that should not open, blinks.\"  
+    \"...a hand that should not reach, reaches.\"  
+    \"...an eye that should not open, blinks.\"  
 
-The tone is neither threat nor greeting.  
-It is amusement.  
+    The tone is neither threat nor greeting.  
+    It is amusement.  
 
-\"You scurry, little one.  
-You paw at threads unseen.  
-For that… I will leave you a morsel.\"  
+    \"You scurry, little one.  
+    You paw at threads unseen.  
+    For that… I will leave you a morsel.\"  
 
-A pull gnaws at your chest,  
-offering warmth, a whisper of clarity,  
-The promise of an easier path,  
-less hunger in the nights to come,  
-the veil of fear thinned for your tiny mind.  
-All you must do…  
-is step away.  
-Leave the wound unhealed.  
-Forget you saw it.  
+    A pull gnaws at your chest,  
+    offering warmth, a whisper of clarity,  
+    The promise of an easier path,  
+    less hunger in the nights to come,  
+    the veil of fear thinned for your tiny mind.  
+    All you must do…  
+    is step away.  
+    Leave the wound unhealed.  
+    Forget you saw it.  
 
-The presence stirs,  
-like a tide withdrawing,  
-already forgetting your shape.\n"""  
+    The presence stirs,  
+    like a tide withdrawing,  
+    already forgetting your shape.\n"""  
         ],
         "wait": True,
         "choices": [
@@ -562,66 +575,66 @@ already forgetting your shape.\n"""
     "whispering_conduit.acceptance": {
         "text": [
             """=== Acceptance: The Dream of Normalcy ===
-You stop.  
-The whispers seep deeper, curling like smoke through every corner of thought.  
-And in that moment, you realize:  
-you don’t want this fight.  
-You never wanted it.  
-Not blood.  
-Not terror.  
-Not shadow‑cloaked wars with gods you cannot fathom.  
-Just peace.  
-Just normalcy.  
+    You stop.  
+    The whispers seep deeper, curling like smoke through every corner of thought.  
+    And in that moment, you realize:  
+    you don’t want this fight.  
+    You never wanted it.  
+    Not blood.  
+    Not terror.  
+    Not shadow‑cloaked wars with gods you cannot fathom.  
+    Just peace.  
+    Just normalcy.  
 
-You bow your head.  
-A wordless assent leaves your lips,  
-a contract signed in silence.  
-Something tears.  
-Not flesh. Not bone.  
-Something within you.  
-A sliver of self unspools and drifts away, claimed by the unseen hand.  
-Darkness folds around you.  
-Consciousness unravels.  
-And then  
+    You bow your head.  
+    A wordless assent leaves your lips,  
+    a contract signed in silence.  
+    Something tears.  
+    Not flesh. Not bone.  
+    Something within you.  
+    A sliver of self unspools and drifts away, claimed by the unseen hand.  
+    Darkness folds around you.  
+    Consciousness unravels.  
+    And then  
 
-\"Wake up already, you’re going to be late!\"  
+    \"Wake up already, you’re going to be late!\"  
 
-Your eyes snap open.  
-Sunlight filters through cheap blinds.  
-The hum of morning traffic bleeds through the walls.  
-You stumble upright, heart hammering.  
-No cultists.  
-No conduits.  
-No blood.  
-Just the familiar clutter of your dorm room.  
-It’s 9:15.  
-You’re late for class.  
+    Your eyes snap open.  
+    Sunlight filters through cheap blinds.  
+    The hum of morning traffic bleeds through the walls.  
+    You stumble upright, heart hammering.  
+    No cultists.  
+    No conduits.  
+    No blood.  
+    Just the familiar clutter of your dorm room.  
+    It’s 9:15.  
+    You’re late for class.  
 
-You rush through the motions,  
-pulling on jeans, slinging your bag over your shoulder.  
-Something nags at you.  
-Why did you jolt awake like that?  
-Like a soldier out of a dream of battle.  
-Like a hero torn from an action reel.  
+    You rush through the motions,  
+    pulling on jeans, slinging your bag over your shoulder.  
+    Something nags at you.  
+    Why did you jolt awake like that?  
+    Like a soldier out of a dream of battle.  
+    Like a hero torn from an action reel.  
 
-But the thought slips away.  
-Whatever it was, it doesn’t matter now.  
-Everything feels… easier.  
-The walk across campus.  
-The chatter of classmates.  
-The words of the professor flowing like water.  
+    But the thought slips away.  
+    Whatever it was, it doesn’t matter now.  
+    Everything feels… easier.  
+    The walk across campus.  
+    The chatter of classmates.  
+    The words of the professor flowing like water.  
 
-Was it always like this?  
-Or is something new humming just beneath the surface?  
-The question lingers,  
-a splinter your mind refuses to touch.  
+    Was it always like this?  
+    Or is something new humming just beneath the surface?  
+    The question lingers,  
+    a splinter your mind refuses to touch.  
 
-You laugh softly to yourself.  
-What a dumb thought.  
-This isn’t a game.  
-This isn’t a story.  
-This is real life.  
-And life has never been better.  
+    You laugh softly to yourself.  
+    What a dumb thought.  
+    This isn’t a game.  
+    This isn’t a story.  
+    This is real life.  
+    And life has never been better.  
 
 
 [ENDING: Blissful Ignorance]"""
@@ -634,81 +647,83 @@ And life has never been better.
     "whispering_conduit.defiance": {
         "text": [
             """=== Defiance ===
-Your hand presses against the conduit.  
-The whispers falter.  
-Then sharpen.  
-The amusement rots into something colder,  
-a ripple of disdain.  
+    Your hand presses against the conduit.  
+    The whispers falter.  
+    Then sharpen.  
+    The amusement rots into something colder,  
+    a ripple of disdain.  
 
-Agony rips through your body  
-as the structure convulses,  
-imploding into itself with a scream  
-that no throat could ever make —  
-screaming silently into absence.  
+    Agony rips through your body  
+    as the structure convulses,  
+    imploding into itself with a scream  
+    that no throat could ever make —  
+    screaming silently into absence.  
 
-You fall, trembling, lungs ragged.  
-Alive but not unmarked.  
+    You fall, trembling, lungs ragged.  
+    Alive but not unmarked.  
 
-For a moment, you are sure this is the end.  
-Not death.  
-Defeat.  
-The quiet, smothering certainty that nothing will ever change.  
-That no action matters.  
-That you are too small,  
-too late,  
-too alone.  
+    For a moment, you are sure this is the end.  
+    Not death.  
+    Defeat.  
+    The quiet, smothering certainty that nothing will ever change.  
+    That no action matters.  
+    That you are too small,  
+    too late,  
+    too alone.  
 
-And in that moment,  
-something inside you breaks.  
-Not comfort. Not salvation.  
+    And in that moment,  
+    something inside you breaks.  
+    Not comfort. Not salvation.  
 
-Hope.  
+    Hope.  
 
-The fragile light you clung to in the dark,
-the quiet belief that it could still matter,
-slips from your grasp, not torn, but surrendered,
-as if even your soul had grown too tired to hold it.
+    The fragile light you clung to in the dark,
+    the quiet belief that it could still matter,
+    slips from your grasp, not torn, but surrendered,
+    as if even your soul had grown too tired to hold it.
 
-it does not vanish.
-it lets go.
+    it does not vanish.
+    it lets go.
 
-it rises not in brilliance,
-but in stillness.
-Pale light, gentle and unearned,
-folding into shape like a prayer long forgotten.
+    it rises not in brilliance,
+    but in stillness.
+    Pale light, gentle and unearned,
+    folding into shape like a prayer long forgotten.
 
-It watches you,
-not with judgment,
-but with grief.
+    It watches you,
+    not with judgment,
+    but with grief.
 
-a hollowed reflection of what you once needed to believe.
-not to survive but to endure.
+    a hollowed reflection of what you once needed to believe.
+    not to survive but to endure.
 
-[MANIFESTATION UNLOCKED: **Hope**]  
+    [MANIFESTATION UNLOCKED: **Hope**]  
 
-It does not bring comfort.  
-It does not restore what was lost.  
-But it will linger until the void swallows you whole.  
+    It does not bring comfort.  
+    It does not restore what was lost.  
+    But it will linger until the void swallows you whole.  
 
-And in this place,  
-that is enough to shape reality.  
+    And in this place,  
+    that is enough to shape reality.  
 
-Before the presence withdraws,  
-a thought lingers in the hollow of your mind:  
+    Before the presence withdraws,  
+    a thought lingers in the hollow of your mind:  
 
-"You gnawed the hand that brushed you.  
-I will remember."  
+    "You gnawed the hand that brushed you.  
+    I will remember."  
 
-And then…  
-silence.  
+    And then…  
+    silence.  
 
-The conduit is gone.  
-But the weight of its notice remains.  
-And within the vacuum left behind,  
-Hope flickers.  
-No longer yours.  
-Now something else entirely."""
-        ],
+    The conduit is gone.  
+    But the weight of its notice remains.  
+    And within the vacuum left behind,  
+    Hope flickers.  
+    No longer yours.  
+    Now something else entirely."""
+        ], 
+        "doom_tick": 1,
+        "doom_reason": "As the conduit closes so does time...",
         "wait": True,
         "end": True  # also an ending, or chain to another node
     
@@ -724,24 +739,24 @@ Now something else entirely."""
         },
         "text": [
             "\n=== Chapter III: Withering Flame ===\n\n",
-            """The plane screeches into the station, brakes screaming like metal in agony.  
-You step onto the platform, suitcase wheels abandoned long ago.  
+            """    The plane screeches into the station, brakes screaming like metal in agony.  
+    You step onto the platform, suitcase wheels abandoned long ago.  
 
-The airport yawns ahead.  
-Not bustling. Not alive.  
-A hollow carcass of glass and steel.  
+    The airport yawns ahead.  
+    Not bustling. Not alive.  
+    A hollow carcass of glass and steel.  
 
-Departure screens flicker with flights that do not exist,  
-destinations that shift too quickly for the eye to follow.  
+    Departure screens flicker with flights that do not exist,  
+    destinations that shift too quickly for the eye to follow.  
 
-Luggage belts churn with no cargo.  
-Only empty suitcases circle endlessly, their tags smeared with ink that looks like veins.  
+    Luggage belts churn with no cargo.  
+    Only empty suitcases circle endlessly, their tags smeared with ink that looks like veins.  
 
-And there at the far end of the hall,  
-Yet another conduit.  
-Yet another promise of nothing but ruin.  
+    And there at the far end of the hall,  
+    Yet another conduit.  
+    Yet another promise of nothing but ruin.  
 
-You walk, though each step feels heavier than the last."""
+    You walk, though each step feels heavier than the last."""
         ],
         "wait": True,
         "next": "3_first_encounter"
@@ -750,26 +765,26 @@ You walk, though each step feels heavier than the last."""
 # === THIRD CONDUIT FIRST ENCOUNTER ===
         "text": [
             "\n=== First Encounter ===\n",
-            """The glow intensifies.  
-But you are not alone this time.  
+            """    The glow intensifies.  
+    But you are not alone this time.  
 
-Figures step from the shadows.  
-Three, then six, then a dozen.  
-Robes of the cult, black and crimson, blades in hand.  
+    Figures step from the shadows.  
+    Three, then six, then a dozen.  
+    Robes of the cult, black and crimson, blades in hand.  
 
-And at their front — a man draped in heavy vestments, embroidered with spiraling sigils.  
-A High Priest.  
-His eyes gleam with fevered ecstasy.  
+    And at their front — a man draped in heavy vestments, embroidered with spiraling sigils.  
+    A High Priest.  
+    His eyes gleam with fevered ecstasy.  
 
-\"So the Order sends another pawn,\"  
+    \"So the Order sends another pawn,\"  
 
-his voice echoes, half sermon, half condemnation.  
+    his voice echoes, half sermon, half condemnation.  
 
-\"You think yourself savior, but you only tighten the chains of this world.\"  
+    \"You think yourself savior, but you only tighten the chains of this world.\"  
 
-He raises his hands.  
-The cultists chant.  
-And the air shudders like a drumskin."""
+    He raises his hands.  
+    The cultists chant.  
+    And the air shudders like a drumskin."""
         ],
 # === THIRD CONDUIT COMBAT ===
         "wait": False,
@@ -786,9 +801,9 @@ And the air shudders like a drumskin."""
             "fade_ms": 1500
         },
         "text": [
-            "\nThe chanting ends with a final gurgled breath.",
-            "The High Priest collapses,",
-            "his vestments darkening with spreading blood.",
+            "\nThe chanting ends with a final gurgled breath.\n",
+            "The High Priest collapses,\n",
+            "his vestments darkening with spreading blood.\n",
             "The air still hums with the weight of their ritual, but for now, it is over.\n",
         ],
         "wait": True,
@@ -804,37 +819,37 @@ And the air shudders like a drumskin."""
         "text": [
 # === THIRD CONDUIT ENCOUNTER ===
             "=== The Conduit ===\n",
-            """Bloodied, gasping, you press onward.  
-The cultists lie broken, their hymn silenced  
-but the glow has grown louder than any chorus.  
+            """    Bloodied, gasping, you press onward.  
+    The cultists lie broken, their hymn silenced  
+    but the glow has grown louder than any chorus.  
 
-The conduit looms.  
-Angles that do not meet, geometry that sneers at Euclid.  
-A wound in the world.  
+    The conduit looms.  
+    Angles that do not meet, geometry that sneers at Euclid.  
+    A wound in the world.  
 
-The whispers begin again.  
-No. Stronger this time.  
-They do not seep.  
-They *hammer*.  
+    The whispers begin again.  
+    No. Stronger this time.  
+    They do not seep.  
+    They *hammer*.  
 
-A chorus of voices, overlapping, endless.  
-Language unspoken, yet every word burns meaning into your skull.  
+    A chorus of voices, overlapping, endless.  
+    Language unspoken, yet every word burns meaning into your skull.  
 
-*We see you.*  
-*We know you.*  
-*Little flame crawling where fire does not belong.*  
+    *We see you.*  
+    *We know you.*  
+    *Little flame crawling where fire does not belong.*  
 
-Your head throbs.  
-Your vision fractures.  
+    Your head throbs.  
+    Your vision fractures.  
 
-And then, like a serpent coiling close, one voice cuts through the cacophony.  
-Silken, amused.  
+    And then, like a serpent coiling close, one voice cuts through the cacophony.  
+    Silken, amused.  
 
-*You bleed. You break. For what?*  
-*Close this gate, and another will open. And another. And another.*  
-*What you destroy today, we will birth tomorrow.*  
+    *You bleed. You break. For what?*  
+    *Close this gate, and another will open. And another. And another.*  
+    *What you destroy today, we will birth tomorrow.*  
 
-*Take ease, child. You may rest. You may live. We will grant you dreams unspoiled by terror.*\n"""
+    *Take ease, child. You may rest. You may live. We will grant you dreams unspoiled by terror.*\n"""
         ],
 # === THIRD CONDUIT ENCOUNTER CHOICES ===
         "wait": False,
@@ -853,57 +868,57 @@ Silken, amused.
     "3_conduit_encounter.accept": {
         "text": [
             "=== Acceptance: The Dream of Triumph ===\n",
-            """Your hand falls away from the conduit.  
-The whispers curl closer, warm and cold at once.  
-A voice like velvet, like oil, like nothing human at all slides beneath your ribs.  
+            """    Your hand falls away from the conduit.  
+    The whispers curl closer, warm and cold at once.  
+    A voice like velvet, like oil, like nothing human at all slides beneath your ribs.  
 
-*So small, yet so stubborn. But even ants may dream.*  
+    *So small, yet so stubborn. But even ants may dream.*  
 
-And then the airport melts.  
-Glass and tile dissolve into gold and light.  
+    And then the airport melts.  
+    Glass and tile dissolve into gold and light.  
 
-You are standing on a stage.  
-Thousands of faces blur together, shouting your name.  
-Flashbulbs explode like stars.  
+    You are standing on a stage.  
+    Thousands of faces blur together, shouting your name.  
+    Flashbulbs explode like stars.  
 
-You are brilliant.  
-Famous.  
-Powerful.  
-Whatever you ever wanted to be, you are.  
-Awards, lovers, riches, influence  
-each one is placed in your hands like an offering.  
+    You are brilliant.  
+    Famous.  
+    Powerful.  
+    Whatever you ever wanted to be, you are.  
+    Awards, lovers, riches, influence  
+    each one is placed in your hands like an offering.  
 
-Days become weeks.  
-Weeks become years.  
+    Days become weeks.  
+    Weeks become years.  
 
-Your image glows from billboards.  
-You sign books you don’t remember writing.  
-You accept accolades for deeds you don’t recall performing.  
-Everyone smiles when they see you.  
-Everyone knows your name.  
+    Your image glows from billboards.  
+    You sign books you don’t remember writing.  
+    You accept accolades for deeds you don’t recall performing.  
+    Everyone smiles when they see you.  
+    Everyone knows your name.  
 
-And yet…  
+    And yet…  
 
-Every cheer sounds the same.  
-Every face, in every crowd, has the same fixed smile.  
-Every night the champagne tastes like dust.  
-Every morning the mirror shows someone a little less real than the day before.  
+    Every cheer sounds the same.  
+    Every face, in every crowd, has the same fixed smile.  
+    Every night the champagne tastes like dust.  
+    Every morning the mirror shows someone a little less real than the day before.  
 
-Sometimes, in the space between dreams,  
-you remember something.  
-Airports.  
-Whispers.  
-Blood.  
-A man dying, reaching for you.  
+    Sometimes, in the space between dreams,  
+    you remember something.  
+    Airports.  
+    Whispers.  
+    Blood.  
+    A man dying, reaching for you.  
 
-But the memory dissolves before you can hold it.  
-A voice you cannot name purrs against your skull:  
+    But the memory dissolves before you can hold it.  
+    A voice you cannot name purrs against your skull:  
 
-*Sleep. Shine. Smile.*  
-*It is all we ask.*  
+    *Sleep. Shine. Smile.*  
+    *It is all we ask.*  
 
-You nod without realizing.  
-And the dream swallows you whole.  
+    You nod without realizing.  
+    And the dream swallows you whole.  
 
 [ENDING: False Glory]"""
         ],
@@ -915,80 +930,82 @@ And the dream swallows you whole.
     "3_conduit_encounter.defy": {
         "text": [
             "=== Defiance: The Anatomist ===\n",
-            """You scream into the conduit’s light.  
-Your hand strikes its surface.  
-Agony rips through you  
-not like fire, but like pages torn from a book.  
+            """    You scream into the conduit’s light.  
+    Your hand strikes its surface.  
+    Agony rips through you  
+    not like fire, but like pages torn from a book.  
 
-You collapse, choking on the taste of iron.  
-The world swims red at the edges.  
-And in the hollow between your heartbeat,  
-you feel it happen.  
+    You collapse, choking on the taste of iron.  
+    The world swims red at the edges.  
+    And in the hollow between your heartbeat,  
+    you feel it happen.  
 
-Something leaves you.  
-Not justice.  
-Not truth.  
+    Something leaves you.  
+    Not justice.  
+    Not truth.  
 
-Resentment.  
+    Resentment.  
 
-The festering kernel of every slight,  
-every wound endured,  
-every injustice that lodged itself inside you  
-and never found release.  
+    The festering kernel of every slight,  
+    every wound endured,  
+    every injustice that lodged itself inside you  
+    and never found release.  
 
-It does not vanish.  
-It remembers.  
+    It does not vanish.  
+    It remembers.  
 
-Sloughing away from your psyche like rotted skin,  
-but hardening, coiling,  
-taking form in the world.  
+    Sloughing away from your psyche like rotted skin,  
+    but hardening, coiling,  
+    taking form in the world.  
 
-It glares at you with your own bitterness.  
-It breathes with your own hate.  
-And it smiles with the knowledge  
-that to hurt others is to heal itself.  
+    It glares at you with your own bitterness.  
+    It breathes with your own hate.  
+    And it smiles with the knowledge  
+    that to hurt others is to heal itself.  
 
-[MANIFESTATION UNLOCKED: Resentment]  
+    [MANIFESTATION UNLOCKED: Resentment]  
 
-It will not console you.  
-It will not make you whole.  
-But it will cling until nothing remains but hunger.  
+    It will not console you.  
+    It will not make you whole.  
+    But it will cling until nothing remains but hunger.  
 
-And in this place,  
-that is enough to shape reality.  
+    And in this place,  
+    that is enough to shape reality.  
 
-The conduit collapses, its geometry snapping inward with a final shriek.  
-But silence does not follow.  
+    The conduit collapses, its geometry snapping inward with a final shriek.  
+    But silence does not follow.  
 
-From the ruin, a scraping sound.  
-Metal against tile.  
-Slow. Heavy.  
-Deliberate.  
+    From the ruin, a scraping sound.  
+    Metal against tile.  
+    Slow. Heavy.  
+    Deliberate.  
 
-A shadow emerges.  
-Tall.  
-Too tall.  
+    A shadow emerges.  
+    Tall.  
+    Too tall.  
 
-Tattered surgical cloth hangs from its frame,  
-splashed with stains long since dried black.  
-Its face is hidden behind cracked glass and twisted steel,  
-a surgeon’s mask fused into flesh.  
-In one hand, it drags a scalpel as long as your arm,  
-its edge chipped, pitted, yet impossibly sharp.  
+    Tattered surgical cloth hangs from its frame,  
+    splashed with stains long since dried black.  
+    Its face is hidden behind cracked glass and twisted steel,  
+    a surgeon’s mask fused into flesh.  
+    In one hand, it drags a scalpel as long as your arm,  
+    its edge chipped, pitted, yet impossibly sharp.  
 
-Its voice is the screech of rust and the hum of bone saws:  
-\"The whispers spoke true.  
-At last, a specimen worthy of study.\"  
+    Its voice is the screech of rust and the hum of bone saws:  
+    \"The whispers spoke true.  
+    At last, a specimen worthy of study.\"  
 
-It raises the scalpel, twitching in anticipation.  
-\"You will show me how much can be carved away before the soul expires.\"  
+    It raises the scalpel, twitching in anticipation.  
+    \"You will show me how much can be carved away before the soul expires.\"  
 
-It takes steps closer in increasing tempo.  
-The scalpel sings across the floor.  
-And you realize  
-you are not facing a foe.  
-You are facing an experiment. \n"""
+    It takes steps closer in increasing tempo.  
+    The scalpel sings across the floor.  
+    And you realize  
+    you are not facing a foe.  
+    You are facing an experiment. \n"""
         ],
+        "doom_tick": 1,
+        "doom_reason": "As the conduit closes so does time...",
         "wait": True,
         "end": True
     },
@@ -1005,82 +1022,82 @@ You are facing an experiment. \n"""
     "anatomist.aftermath": {
         "music": {
             "action": "play",
-            "track": "Music/ambience/Airport_dread.mp3",  # Change to your actual track
+            "track": "Music/ambience/Airport_dread.mp3",
             "volume": 0.12,
             "loop": True
         },
         "text": [
             "=== Aftermath ===\n",
-            """The Anatomist crumples, scalpel clanging against the floor,  
-its final rattle echoing through the empty concourse.  
+            """    The Anatomist crumples, scalpel clanging against the floor,  
+    its final rattle echoing through the empty concourse.  
 
-You stagger, body broken, mind splintered.  
-But alive.  
+    You stagger, body broken, mind splintered.  
+    But alive.  
 
-For now.  
+    For now.  
 
-The silence that follows is not complete.  
-In the edges of your hearing, a thousand murmurs stir  
-not angry.  
-Not disappointed.  
-*Amused.*  
+    The silence that follows is not complete.  
+    In the edges of your hearing, a thousand murmurs stir  
+    not angry.  
+    Not disappointed.  
+    *Amused.*  
 
-You know now:  
-the cult is not the true danger.  
-They are tools. Pawns. Distractions.  
+    You know now:  
+    the cult is not the true danger.  
+    They are tools. Pawns. Distractions.  
 
-Each conduit closed draws more attention.  
-Each act of defiance makes the abyss lean closer.  
+    Each conduit closed draws more attention.  
+    Each act of defiance makes the abyss lean closer.  
 
-And the Anatomist was not alone.  
-Others wait.  
-Others watch.  
-And each one is *for you*.  
+    And the Anatomist was not alone.  
+    Others wait.  
+    Others watch.  
+    And each one is *for you*.  
 
-You press onward.  
-Because you must.  
-Because there is no other choice.\n"""
+    You press onward.  
+    Because you must.  
+    Because there is no other choice.\n"""
         ],
         "wait": True,
         "end": True,
     },
 # === FOURTH CONDUIT STORY START ===
 "4_conduit": {
-#    "music": {
-#        "action": "play",
-#        "track": "Music/ambience/Fracture_static.mp3",
-#        "volume": 0.12,
-#        "loop": True
-#    },
+    "music": {
+        "action": "play",
+        "track": "Music/ambience/Chaos_in_terminal.mp3",
+        "volume": 0.12,
+        "loop": True
+    },
     "text": [
         "\n=== Chapter IV: The Fractured Sky ===\n\n",
-        """The airport doors part with a hiss,  
-but the air that greets you is not air.  
-It is heavy. Grainy.  
-Every breath scratches down your throat like sandpaper.  
+        """    The airport doors part with a hiss,  
+    but the air that greets you is not air.  
+    It is heavy. Grainy.  
+    Every breath scratches down your throat like sandpaper.  
 
-The terminal is not quiet, yet no sound belongs.  
-Screens flicker between flights and visions,  
-departure times woven with sigils that pulse like veins.  
-A child’s laughter echoes from nowhere,  
-then cuts into a scream that never finishes.  
+    The terminal is not quiet, yet no sound belongs.  
+    Screens flicker between flights and visions,  
+    departure times woven with sigils that pulse like veins.  
+    A child’s laughter echoes from nowhere,  
+    then cuts into a scream that never finishes.  
 
-Reality is crying out.  
-The veil tears with every heartbeat,  
-its seams stretched thin against what presses from the other side.  
+    Reality is crying out.  
+    The veil tears with every heartbeat,  
+    its seams stretched thin against what presses from the other side.  
 
-For a moment, doubt claws at you.  
-Ezekiel’s words echo, but so do theirs.  
-They called you dust.  
-An insect.  
-Something to be brushed aside by inevitability.  
+    For a moment, doubt claws at you.  
+    Ezekiel’s words echo, but so do theirs.  
+    They called you dust.  
+    An insect.  
+    Something to be brushed aside by inevitability.  
 
-Your hand trembles.  
-But you remember Ezekiel’s conviction,  
-his eyes in that last moment,  
-and you force steel into your spine.  
+    Your hand trembles.  
+    But you remember Ezekiel’s conviction,  
+    his eyes in that last moment,  
+    and you force steel into your spine.  
 
-This cannot be the wrong path.\n""",
+    This cannot be the wrong path.\n""",
     ],
     "wait": True,
     "next": "4_greeting"
@@ -1090,46 +1107,46 @@ This cannot be the wrong path.\n""",
 "4_greeting": {
     "text": [
         "\n=== The Greeting ===\n\n",
-        """The cult is waiting.  
-Not hiding.  
-Waiting.  
+        """    The cult is waiting.  
+    Not hiding.  
+    Waiting.  
 
-Their robes catch no wind,  
-but sway as if submerged in water.  
-Eyes gleam from shadowed hoods,  
-some with hatred, some with a flicker of fear.  
-They know you now.  
-They speak your name in hushed whispers, half-curse, half-prayer.  
+    Their robes catch no wind,  
+    but sway as if submerged in water.  
+    Eyes gleam from shadowed hoods,  
+    some with hatred, some with a flicker of fear.  
+    They know you now.  
+    They speak your name in hushed whispers, half-curse, half-prayer.  
 
-But the fear dies quickly.  
-A new voice threads through the silence,  
-not from their mouths, but from the air itself.  
+    But the fear dies quickly.  
+    A new voice threads through the silence,  
+    not from their mouths, but from the air itself.  
 
-Whispers.  
-Low, constant, maddening.  
-The same chorus that stalks your sleep, that gnaws the corners of your waking hours.  
+    Whispers.  
+    Low, constant, maddening.  
+    The same chorus that stalks your sleep, that gnaws the corners of your waking hours.  
 
-And then her.  
+    And then her.  
 
-One among them does not cease her chant when your gaze finds her.  
-Her lips move, spilling words not meant for this world,  
-but her eyes hold yours.  
-Cold. Measured.  
-Not rage. Not zeal.  
-Intent.  
+    One among them does not cease her chant when your gaze finds her.  
+    Her lips move, spilling words not meant for this world,  
+    but her eyes hold yours.  
+    Cold. Measured.  
+    Not rage. Not zeal.  
+    Intent.  
 
-Your skull throbs with pressure.  
-Your teeth ache.  
-Her voice is not in your ears,  
-but in your marrow.  
+    Your skull throbs with pressure.  
+    Your teeth ache.  
+    Her voice is not in your ears,  
+    but in your marrow.  
 
-To them, you are not an enemy to defeat.  
-You are an obstacle to be erased."""
+    To them, you are not an enemy to defeat.  
+    You are an obstacle to be erased."""
     ],
     "wait": False,
     "combat": {
         "enemies": ["Cultist", "Cultist", "Apostle", "High Priest"],
-#        "music": "Music/combat/Dirgefield.mp3"
+        "music": "Music/combat/your_fear.mp3"
     },
     "end": True
 },
@@ -1138,46 +1155,46 @@ You are an obstacle to be erased."""
 "4_conduit.encounter": {
     "music": {
         "action": "play",
-#        "track": "Music/ambience/Fracture_static.mp3",
+        "track": "Music/ambience/Chaos_in_terminal.mp3",
         "volume": 0.12,
         "loop": True
     },
     "text": [
         "\n=== The Conduit ===\n\n",
-        """You stagger forward,  
-breath hitching,  
-toward the glow that stains the far end of the hall.  
+        """    You stagger forward,  
+    breath hitching,  
+    toward the glow that stains the far end of the hall.  
 
-It is larger this time.  
-Hungrier.  
-The geometry buckles,  
-walls and floor warping in its radius,  
-as if reality itself recoils from the wound.  
+    It is larger this time.  
+    Hungrier.  
+    The geometry buckles,  
+    walls and floor warping in its radius,  
+    as if reality itself recoils from the wound.  
 
-The whispers crescendo.  
-Not background.  
-Not distant.  
-They are here.  
-They are with you.  
+    The whispers crescendo.  
+    Not background.  
+    Not distant.  
+    They are here.  
+    They are with you.  
 
-You feel it, don’t you?  
-The futility. The unraveling.  
-Already the air shreds. Already the skin of this world thins.  
+    *You feel it, don’t you?*
+    *The futility. The unraveling.*  
+    *Already the air shreds. Already the skin of this world thins.*  
 
-Their voices coil like serpents through your thoughts.  
-Not desperate.  
-Not hurried.  
-Amused.  
+    Their voices coil like serpents through your thoughts.  
+    Not desperate.  
+    Not hurried.  
+    Amused.  
 
-*You have entertained us, little flicker.*  
-*Defied us, clawed against the tide.*  
-*Dust should not burn so brightly.*  
+    *You have entertained us, little flicker.*  
+    *Defied us, clawed against the tide.*  
+    *Dust should not burn so brightly.*  
 
-A pause, almost tender.  
+    A pause, almost tender.  
 
-*One last deal, then.*  
-*Not for our need,*  
-*for our delight.*\n"""
+    *One last deal, then.*  
+    *Not for our need,*  
+    *for our delight.*\n"""
     ],
     "wait": True,
     "choices": [
@@ -1196,66 +1213,66 @@ A pause, almost tender.
 "4_conduit.accept": {
     "text": [
         "\n=== Acceptance: The Crown of Nothing ===\n\n",
-        """You let the whispers in.  
-Not just into your mind, into your blood, your very name.  
-The conduit does not collapse this time.  
-It blossoms.  
+        """    You let the whispers in.  
+    Not just into your mind, into your blood, your very name.  
+    The conduit does not collapse this time.  
+    It blossoms.  
 
-And so do you.  
+    And so do you.  
 
-You awaken to thunderous applause.  
-No longer a terminal.  
-No longer dust.  
+    You awaken to thunderous applause.  
+    No longer a terminal.  
+    No longer dust.  
 
-You sit upon a throne carved from marble that remembers no quarry.  
-Banners drape from vaulted ceilings, each one bearing your sigil, your face, your victories, your will.  
-Before you stretch oceans of people, their heads bowed, their chants your name alone.  
+    You sit upon a throne carved from marble that remembers no quarry.  
+    Banners drape from vaulted ceilings, each one bearing your sigil, your face, your victories, your will.  
+    Before you stretch oceans of people, their heads bowed, their chants your name alone.  
 
-Power hums in your veins, no longer stolen, no longer borrowed.  
-It is yours.  
-Nations bend at your command.  
-Armies march where you point.  
-Even kings, even prophets, kneel at your feet.  
+    Power hums in your veins, no longer stolen, no longer borrowed.  
+    It is yours.  
+    Nations bend at your command.  
+    Armies march where you point.  
+    Even kings, even prophets, kneel at your feet.  
 
-You are not part of the machine.  
-You *are* the machine.  
-Every cog spins for you, every gear grinds to your design.  
-The world’s breath is your breath.  
-Its heart, your heart.  
+    You are not part of the machine.  
+    You *are* the machine.  
+    Every cog spins for you, every gear grinds to your design.  
+    The world’s breath is your breath.  
+    Its heart, your heart.  
 
-And yet  
-when the cheers fade,  
-when the banners ripple in silence,  
-you hear it.  
+    And yet  
+    when the cheers fade,  
+    when the banners ripple in silence,  
+    you hear it.  
 
-The hollow echo.  
-The space between each praise,  
-the emptiness beneath every oath of loyalty.  
-Their eyes never meet yours.  
-Their mouths move, but their smiles are painted, stretched too wide.  
+    The hollow echo.  
+    The space between each praise,  
+    the emptiness beneath every oath of loyalty.  
+    Their eyes never meet yours.  
+    Their mouths move, but their smiles are painted, stretched too wide.  
 
-You try to speak  
-but your words vanish before leaving your lips,  
-absorbed into the silence like stones into water.  
+    You try to speak  
+    but your words vanish before leaving your lips,  
+    absorbed into the silence like stones into water.  
 
-A crown weighs heavy on your head.  
-Too heavy.  
-Crushing.  
+    A crown weighs heavy on your head.  
+    Too heavy.  
+    Crushing.  
 
-And in the quiet between breaths, you realize  
-you are not their ruler.  
-You are their entertainment.  
-Their puppet.  
+    And in the quiet between breaths, you realize  
+    you are not their ruler.  
+    You are their entertainment.  
+    Their puppet.  
 
-A monarch seated on a stage,  
-adored by phantoms,  
-caged in a fantasy that is not yours.  
+    A monarch seated on a stage,  
+    adored by phantoms,  
+    caged in a fantasy that is not yours.  
 
-Still, you wear the crown.  
-You wave to the masses.  
-You sit upon the throne of Nothing.  
+    Still, you wear the crown.  
+    You wave to the masses.  
+    You sit upon the throne of Nothing.  
 
-And you never wake again.  
+    And you never wake again.  
 
 [ENDING: The Crown of Nothing]"""
     ],
@@ -1268,216 +1285,218 @@ And you never wake again.
 "4_conduit.defy": {
     "text": [
         "\n=== Defiance ===\n\n",
-        """Your hand meets the conduit.  
-Agony.  
-Always agony.  
+        """    Your hand meets the conduit.  
+    Agony.  
+    Always agony.  
 
-But this time, the whispers do not recoil.  
-They converge.  
-A chorus not of promises, but of hunger  
-a tide pressing against the walls of your skull.  
+    But this time, the whispers do not recoil.  
+    They converge.  
+    A chorus not of promises, but of hunger  
+    a tide pressing against the walls of your skull.  
 
-You stagger, doubled over, chest heaving with fire.  
-The world swims red, your veins screaming, your heart pounding too fast,  
-too loud.  
+    You stagger, doubled over, chest heaving with fire.  
+    The world swims red, your veins screaming, your heart pounding too fast,  
+    too loud.  
 
-And then it happens.  
+    And then it happens.  
 
-Something inside you tears free.  
-Not righteous.  
-Not heroic.  
+    Something inside you tears free.  
+    Not righteous.  
+    Not heroic.  
 
-**Rage.**  
+    **Rage.**  
 
-The seething ember you buried for so long,  
-the raw defiance that carried you here,  
-splinters away, ripped out as though your soul itself could no longer contain it.  
+    The seething ember you buried for so long,  
+    the raw defiance that carried you here,  
+    splinters away, ripped out as though your soul itself could no longer contain it.  
 
-It does not vanish.  
-It ignites.  
+    It does not vanish.  
+    It ignites.  
 
-Heat coils in the air before you, black smoke bleeding from nothing,  
-shaping itself into a figure: towering, sharpened,  
-a mirror of your fury.  
+    Heat coils in the air before you, black smoke bleeding from nothing,  
+    shaping itself into a figure: towering, sharpened,  
+    a mirror of your fury.  
 
-Its eyes burn like coals, its stance unyielding,  
-its every breath a snarl at existence itself.  
+    Its eyes burn like coals, its stance unyielding,  
+    its every breath a snarl at existence itself.  
 
-[MANIFESTATION UNLOCKED: **Rage**]  
+    [MANIFESTATION UNLOCKED: **Rage**]  
 
-It does not soothe.  
-It does not forgive.  
-But it will remain until your light burns out.  
+    It does not soothe.  
+    It does not forgive.  
+    But it will remain until your light burns out.  
 
-And in this place,  
-that is enough to shape reality.  
+    And in this place,  
+    that is enough to shape reality.  
 
-The conduit collapses, shrieking,  
-its geometry unraveling like a noose pulled tight.  
-Shadows snap back into the corners,  
-but the air does not lighten.  
+    The conduit collapses, shrieking,  
+    its geometry unraveling like a noose pulled tight.  
+    Shadows snap back into the corners,  
+    but the air does not lighten.  
 
-No.  
-Something remains.  
-Something answers.  
+    No.  
+    Something remains.  
+    Something answers.  
 
-From the rippling dark steps a figure  
-veiled in funeral wrappings damp with brine,  
-robes dragging wet across the tiles,  
-leaving puddles where no water should be.  
+    From the rippling dark steps a figure  
+    veiled in funeral wrappings damp with brine,  
+    robes dragging wet across the tiles,  
+    leaving puddles where no water should be.  
 
-Chains of barnacle-eaten iron hang from its arms,  
-clinking like bells rung underwater.  
+    Chains of barnacle-eaten iron hang from its arms,  
+    clinking like bells rung underwater.  
 
-It does not look at you.  
-Not at first.  
-Its head tilts back,  
-the veil trembling as it begins to sing.  
+    It does not look at you.  
+    Not at first.  
+    Its head tilts back,  
+    the veil trembling as it begins to sing.  
 
-The sound is not sound.  
-It is pressure.  
-A dirge pressed into the marrow of your bones.  
-Each note pulls something from the air  
-from the deep.  
+    The sound is not sound.  
+    It is pressure.  
+    A dirge pressed into the marrow of your bones.  
+    Each note pulls something from the air  
+    from the deep.  
 
-The tiles crack. The air ripples.
-Forms slither through, faceless and half-formed,
-fragments of drowned psyches dragged screaming from the void.
-They trash without mouths, claw without fingers,
-ravenous for flesh, for a host.slow_print
+    The tiles crack. The air ripples.
+    Forms slither through, faceless and half-formed,
+    fragments of drowned psyches dragged screaming from the void.
+    They trash without mouths, claw without fingers,
+    ravenous for flesh, for a host.slow_print
 
-The Dirge lowers its head now.
-and it looks at you. Through you.
+    The Dirge lowers its head now.
+    and it looks at you. Through you.
 
-You realize, too late, it has been singing for you all along."""
+    You realize, too late, it has been singing for you all along."""
         ],
+        "doom_tick": 1,
+        "doom_reason": "As the conduit closes so does time...",
         "wait": True,
         "combat": {
             "enemies": ["Dirge of the Deep"],
-#            "music": "Music/combat/Behind_you.mp3"
+            "music": "Music/combat/Let_the_fragments_work.mp3"
         },
         "end": True,
     },
 # === FOURTH CONDUIT AFTERMATH ===
     "4_conduit.aftermath": {
-#        "music": {
-#            "action": "fadeout",
-#            "fade_ms": 1500,
-#        },
-#        "music": {
-#            "action": "play",
-#            "track": "Music/ambience/Airport_dread.mp3",
-#            "volume": 0.12,
-#            "loop": True
-#        },
+        "music": {
+            "action": "fadeout",
+            "fade_ms": 1500,
+        },
+        "music": {
+            "action": "play",
+            "track": "Music/ambience/Airport_dread.mp3",
+            "volume": 0.12,
+            "loop": True
+        },
         "text": [
             """\n=== Aftermath ===\n\n
-The last fragment crumbles into nothing,
-its borrowed flesh unraveling like smoke in water.
-You stand alone in the corridor
-or so you think.
+    The last fragment crumbles into nothing,
+    its borrowed flesh unraveling like smoke in water.
+    You stand alone in the corridor
+    or so you think.
 
-The Dirge still lingers.
-Shattered, wounded,
-its veil torn open by your strikes.
-Beneath the dripping cloth,
-you glimpse not a face,
-but a cavity.
-A hollow where features should be,
-echoing with the resonance of drowned hymns.
+    The Dirge still lingers.
+    Shattered, wounded,
+    its veil torn open by your strikes.
+    Beneath the dripping cloth,
+    you glimpse not a face,
+    but a cavity.
+    A hollow where features should be,
+    echoing with the resonance of drowned hymns.
 
-It reaches out, hand trembling,
-not toward you,
-but toward the void you cannot see.
-Its song falters
-one final note breaking,
-dissolving into a wet cough that shakes the walls.
+    It reaches out, hand trembling,
+    not toward you,
+    but toward the void you cannot see.
+    Its song falters
+    one final note breaking,
+    dissolving into a wet cough that shakes the walls.
 
-The fragments that had clawed at you recoil,
-sucked screaming back into the unseen deep.
-The Dirge shudders once more,
-then collapses,
-its body falling apart into slick rags and seawater
-that seep between the tiles.
+    The fragments that had clawed at you recoil,
+    sucked screaming back into the unseen deep.
+    The Dirge shudders once more,
+    then collapses,
+    its body falling apart into slick rags and seawater
+    that seep between the tiles.
 
-Silence.
+    Silence.
 
-Not relief.
-Not safety.
-Only silence
-as if the airport itself holds its breath.
+    Not relief.
+    Not safety.
+    Only silence
+    as if the airport itself holds its breath.
 
-Your chest heaves.
-Sanity frays at the edges,
-but you endure.
+    Your chest heaves.
+    Sanity frays at the edges,
+    but you endure.
 
-And yet, as the stillness stretches,
-you realize something unshakable:
-the Dirge was not destroyed.
-It was cut off.
-Dragged back to wherever it called from,
-forced into retreat.
+    And yet, as the stillness stretches,
+    you realize something unshakable:
+    the Dirge was not destroyed.
+    It was cut off.
+    Dragged back to wherever it called from,
+    forced into retreat.
 
-Its hymn is not gone.
-It is only waiting.
+    Its hymn is not gone.
+    It is only waiting.
 
-Your hand shakes as you steady yourself against the wall.
-The world wavers,
-like a picture about to tear through its own canvas.
-The air reeks of salt.
-And for the first time,
-you feel the conduit’s destruction has not weakened the Old Ones’ reach—
-but provoked them.
+    Your hand shakes as you steady yourself against the wall.
+    The world wavers,
+    like a picture about to tear through its own canvas.
+    The air reeks of salt.
+    And for the first time,
+    you feel the conduit’s destruction has not weakened the Old Ones’ reach—
+    but provoked them.
 
-One battle won.
-A war deepening.
+    One battle won.
+    A war deepening.
 
-And the path to the next conduit feels heavier than ever before.\n"""
+    And the path to the next conduit feels heavier than ever before.\n"""
         ],
         "wait": True,
         "end": True
     },
      # === CHAPTER V: THE LAST ECLIPSE ===
     "5_conduit": {
-#        "music": {"action": "play", "track": "Music/ambience/Eclipse_arrival.mp3", "volume": 0.12, "loop": True},
+        "music": {"action": "play", "track": "Music/ambience/Eclipse_arrival.mp3", "volume": 0.12, "loop": True},
         "text": [
             """\n=== Chapter V: The Last Eclipse ===\n\n
-The sky no longer behaves.
+    The sky no longer behaves.
 
-It ripples like a mirage,
-bleeds like an open wound,
-shifts like something waking from a dream.
+    It ripples like a mirage,
+    bleeds like an open wound,
+    shifts like something waking from a dream.
 
-From the plane window you watch reality buckle,
-Stars glimmer at noon.
-Shadows crawl without bodies.
-You see shapes moving between seconds,
-each too enormous to belong to your world.
+    From the plane window you watch reality buckle,
+    Stars glimmer at noon.
+    Shadows crawl without bodies.
+    You see shapes moving between seconds,
+    each too enormous to belong to your world.
 
-When the wheels screech to the tarmac,
-you know this is no arrival.
-This is an intrusion.
+    When the wheels screech to the tarmac,
+    you know this is no arrival.
+    This is an intrusion.
 
-The airport is a ruin of flickering light and bending glass.
-Reality here no longer fits.
-Girders stretch like wax.
-Hallways coil into themselves.
-And through every crack in the veil, something vast presses close.
+    The airport is a ruin of flickering light and bending glass.
+    Reality here no longer fits.
+    Girders stretch like wax.
+    Hallways coil into themselves.
+    And through every crack in the veil, something vast presses close.
 
-You step out.
-The air smells like salt and ash.
-Gravity stutters under your feet.
+    You step out.
+    The air smells like salt and ash.
+    Gravity stutters under your feet.
 
-Air shimmers with the passage of forms too colossal to name.
-They move not above, not below, but through.
-The veil is no longer holding.
-Time is no longer holding.
+    Air shimmers with the passage of forms too colossal to name.
+    They move not above, not below, but through.
+    The veil is no longer holding.
+    Time is no longer holding.
 
-This is not an airport anymore.
-It is a threshold.
-A mouth.
-And you are already inside.
-"""
+    This is not an airport anymore.
+    It is a threshold.
+    A mouth.
+    And you are already inside.
+    """
         ],
         "wait": True,
         "choices": [
@@ -1491,71 +1510,77 @@ And you are already inside.
     "5_conduit.chaos": {
         "text": [
             """\n=== Chaos in the Terminal ===\n\n
-Cultists scatter through the concourse,
-their fervor broken into panic.
+    Cultists scatter through the concourse,
+    their fervor broken into panic.
 
-Some claw their own faces bloody,
-shrieking at the visions that bloom before them.
+    Some claw their own faces bloody,
+    shrieking at the visions that bloom before them.
 
-Others kneel, unblinking,
-their mouths hanging open to drink what drips through the cracks of reality.
+    Others kneel, unblinking,
+    their mouths hanging open to drink what drips through the cracks of reality.
 
-And some — the true believers —
-have begun to change.
+    And some — the true believers —
+    have begun to change.
 
-Spines twisting like wet rope.
-Eyes bloom like ulcers across their skin.
-Veins glowing with constellations not found on any map.
-Teeth sprouting in patterns that no god designed.
+    Spines twisting like wet rope.
+    Eyes bloom like ulcers across their skin.
+    Veins glowing with constellations not found on any map.
+    Teeth sprouting in patterns that no god designed.
 
-The Starborn rise among the masses —
-the final reward for their devotion.
-Reaching for you with hands that remember being human.
-"""
+    The Starborn rise among the masses —
+    the final reward for their devotion.
+    Reaching for you with hands that remember being human.
+    """
         ],
         "wait": True,
         "combat": {
             "enemies": ["Starborn", "Starborn", "Cultist"],
-#            "music": "Music/combat/Chaos_in_terminal.mp3"
         },
         "next": "5_conduit.conduit"
     },
     "5_conduit.conduit": {
         "text": [
             """\n=== The Conduit ===\n\n
-You wade through ruin.
-What was once an airport is now a mausoleum of geometry,
-stained by blood and shadow alike.
+    You wade through ruin.
+    What was once an airport is now a mausoleum of geometry,
+    stained by blood and shadow alike.
 
-At last, the conduit reveals itself.
-It is no gate now.
-No wound.
-It is an eye.
+    At last, the conduit reveals itself.
+    It is no gate now.
+    No wound.
+    It is an eye.
 
-It opens in the air before you,
-a lidless pupil vast and depthless,
-gazing outward from a place where no gaze should reach.
+    It opens in the air before you,
+    a lidless pupil vast and depthless,
+    gazing outward from a place where no gaze should reach.
 
-When it looks at you,
-every thought you’ve ever had shatters like glass.
-You are stripped to your essence,
-your struggles laid bare,
-your soul weighed and mocked.
+    When it looks at you,
+    every thought you’ve ever had shatters like glass.
+    You are stripped to your essence,
+    your struggles laid bare,
+    your soul weighed and mocked.
 
-And then the voices.
+    And then the voices.
 
-Not whispers.
-Not temptation.
-But truth.
+    Not whispers.
+    Not temptation.
+    Resonances older than time,
+    vibrations that ripple through the marrow of existence itself.
 
-"We warned you, ant.
-You scurry across the board, striking pieces, flipping tables.
-But the board remains. The game remains. The players remain."
+    "We warned you, ant.
+    You scurry across the board, striking pieces, flipping tables.
+    But the board remains. The game remains. The players remain."
 
-"Close this eye, and another will open.
-You may wound us. You may even delay us. But we are endless.
-We will outlast all."
-"""
+    "Close this eye, and another will open.
+    You may wound us. You may even delay us. But our gaze bends the seconds.
+    Our thought drags stars in chains.
+    We will outlast all."
+
+    Each syllable is impossible, yet undeniable.
+    it is not speech, it is a force.
+    Presence older than stars, pressing against your mind,
+    a reminder that your defiance is measured against eternity itself.
+    """
         ],
         "wait": True,
         "choices": [
@@ -1568,89 +1593,101 @@ We will outlast all."
     "5_conduit.final_battle": {
         "text": [
             """\n=== Final Battle: The Abomination ===\n\n
-The eye convulses.
-The world convulses.
+    You step closer to the eye and as you touch it,
+    you know, as you did in Helsinki that your touch can change the impossible.
 
-Something tears through.
+    The eye convulses.
+    The world convulses.
 
-It is not seen.
-It is not describable.
-It is only felt.
+    Standing at the threshold Ezekiel once stood at,
+    decades compressed into a single pulse of terror.
 
-Skin crawls with shapes your mind cannot keep.
-Your bones ache with frequencies that should not exist.
-Your very name sloughs away like wet paper.
+    Something tears through.
 
-And yet it stands before you.
-The Abomination.
+    It is not seen.
+    It is not describable.
+    It is only felt.
 
-A thing reality does not want,
-does not understand,
-yet cannot deny.
+    Skin crawls with shapes your mind cannot keep.
+    Your bones ache with frequencies that should not exist.
+    Your very name sloughs away like wet paper.
 
-The air screams as it takes form.
-Your body screams as you resist.
-"""
+    And yet it stands before you.
+    The Abomination.
+
+    A thing reality does not want,
+    does not understand,
+    yet cannot deny.
+
+    The air screams as it takes form.
+    Your body screams as you resist.
+    """
         ],
         "wait": False,
         "combat": {
             "enemies": ["Abomination"],
-#            "music": "Music/combat/Final_battle.mp3"
+            "music": "Music/combat/Final_battle.mp3"
         },
+        "music" : {"action": "fadeout", "fade_ms": 1500},
         "next": "5_conduit.aftermath"
     },
 
     "5_conduit.aftermath": {
-#        "music": {"action": "fadeout", "fade_ms": 1500},
+    "music": {
+        "action": "play",
+        "track": "Music/ambience/Epilogue.mp3",
+        "volume": 0.12,
+        "loop": True
+    },
         "text": [
-            """\nThe Abomination falls.
-It does not die.
-It cannot die.
+            """\n    The Abomination falls.
+    It does not die.
+    It cannot die.
 
-But you have weakened it.
-And the world itself rejects its presence.
-The abomination writhes, collapsing inward,
-and is sucked screaming back into the fracture.
+    But you have weakened it.
+    And the world itself rejects its presence.
+    The abomination writhes, collapsing inward,
+    and is sucked screaming back into the fracture.
 
-The eye shudders.
-Closes.
-And is gone.
+    The eye shudders.
+    Closes.
+    And is gone.
 
-You fall to your knees, victorious.
-And empty.
+    You fall to your knees, victorious.
+    And empty.
 
-No agony comes this time.
-No ripping, no tearing.
-Only silence.
+    No agony comes this time.
+    No ripping, no tearing.
+    Only silence.
 
-Like a mirror cracking in perfect stillness,
-your mind fractures.
-Not into pain.
-Not into sorrow.
-But into nothing.
+    Like a mirror cracking in perfect stillness,
+    your mind fractures.
+    Not into pain.
+    Not into sorrow.
+    But into nothing.
 
-Your thoughts fade.
-Your name fades.
-Your being fades.
+    Your thoughts fade.
+    Your name fades.
+    Your being fades.
 
-Were you ever here?
-Did any of this matter?
-The world you saved will rise tomorrow
-as if it had never been threatened.
+    Were you ever here?
+    Did any of this matter?
+    The world you saved will rise tomorrow
+    as if it had never been threatened.
 
-Tomorrow the flights will run again.
-Passengers will walk through spotless halls.
-Children will laugh at glass windows that look out on endless skies.
-And no one will remember that the sky once fractured.
-That the abyss once leaned close.
+    Tomorrow the flights will run again.
+    Passengers will walk through spotless halls.
+    Children will laugh at glass windows that look out on endless skies.
+    And no one will remember that the sky once fractured.
+    That the abyss once leaned close.
 
-And you, the ant who defied gods, will be gone.
-Not celebrated.
-Not mourned.
-Not even forgotten.
+    And you, the ant who defied gods, will be gone.
+    Not celebrated.
+    Not mourned.
+    Not even forgotten.
 
-Erased.
-"""
+    Erased.
+    """
         ],
         "wait": True,
         "next": "5_conduit.epilogue"
@@ -1659,46 +1696,46 @@ Erased.
     "5_conduit.epilogue": {
         "text": [
             """\n=== Epilogue ===\n\n
-The airport hums with its usual rhythm.  
-Rolling luggage.  
-Footsteps on tile.  
-Voices blending into a low, unbroken murmur.  
+    The airport hums with its usual rhythm.  
+    Rolling luggage.  
+    Footsteps on tile.  
+    Voices blending into a low, unbroken murmur.  
 
-On the departure board, flights click and shuffle.  
-Nothing strange.  
-Nothing out of place.  
+    On the departure board, flights click and shuffle.  
+    Nothing strange.  
+    Nothing out of place.  
 
-And yet—  
-the air feels lighter somehow.  
-Or heavier.  
-No one can decide.  
+    And yet—  
+    the air feels lighter somehow.  
+    Or heavier.  
+    No one can decide.  
 
-A clerk behind the counter pauses,  
-pen hovering over paper,  
-unsure why her chest aches.  
+    A clerk behind the counter pauses,  
+    pen hovering over paper,  
+    unsure why her chest aches.  
 
-A pilot looks out at the clouds,  
-squinting as though trying to remember  
-what it was he just forgot.  
+    A pilot looks out at the clouds,  
+    squinting as though trying to remember  
+    what it was he just forgot.  
 
-A child clutches their parent’s hand,  
-eyes wide on nothing at all,  
-and whispers,  
-"I think I had a dream."  
+    A child clutches their parent’s hand,  
+    eyes wide on nothing at all,  
+    and whispers,  
+    "I think I had a dream."  
 
-The parent hushes them gently,  
-and the crowd flows on.  
+    The parent hushes them gently,  
+    and the crowd flows on.  
 
-No announcement is made.  
-No moment is marked.  
+    No announcement is made.  
+    No moment is marked.  
 
-Just a silence,  
-thin as paper,  
-threaded through the day.  
+    Just a silence,  
+    thin as paper,  
+    threaded through the day.  
 
-And then life continues,  
-as it always has.  
-As it always will.  
+    And then life continues,  
+    as it always has.  
+    As it always will.  
 """
         ],
         "wait": True,
@@ -1707,26 +1744,26 @@ As it always will.
 
     "5_conduit.ending": {
         "text": [
-            """\n[The abyss murmurs] \n
-Written & Designed by:\n
-Petteri\n
-Jack\n
-Derej\n
-Pathirage\n
+            """    \n[The abyss murmurs] \n
+    Written & Designed by:\n
+    Petteri\n
+    Jack\n
+    Derej\n
+    Pathirage\n
 
-[The void turns its gaze]
+    [The void turns its gaze]
 
-Special thanks to you, the player,  
-the final witness,  
-the one who dared the conduit’s light.  
+    Special thanks to you, the player,  
+    the final witness,  
+    the one who dared the conduit’s light.  
 
-Your steps are erased,  
-your name forgotten,  
-but the echo of your defiance  
-lingers in the dark.  
+    Your steps are erased,  
+    your name forgotten,  
+    but the echo of your defiance  
+    lingers in the dark.  
 
-THE END
-"""
+    THE END
+    """
         ],
         "wait": True,
         "end": True,

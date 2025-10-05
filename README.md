@@ -19,7 +19,15 @@ Battle cultists and abominations using melee weapons, firearms with magazines an
 - **Background music and SFX** via Pygame (lazy-initialized, safe on machines without audio)
 - **Rich-based UI** for inventory and status bars with ASCII fallback
   - Unified Inventory table (aligned columns: `# | Name | Mag | Qty | Description`)
-  - HP/Sanity/EXP bars; ambient cryptic EXP "whispers" appear in the turn log as you near level-up
+  - Inventory header now includes Markka, ammo reserves, and a dedicated vitals panel (HP/Sanity) rendered beside Level and Doom Clock when Rich is available
+  - Ambient cryptic EXP "whispers" appear in the turn log as you near level-up
+- **Travel loop with narrative feedback**
+  - Menu-driven airport hopping, Markka costs, and conduit discovery/closure
+  - Arrival messages now render as stylized blocks highlighting destination details and Doom Clock shifts
+  - Doom Clock countdown logs inform the player when the clock hits zero, describing the world collapsing into eternal slumber
+- **Rest system refresh**
+  - Resting now draws HP/Sanity directly from `game/player.py:Player` stats and automatically reloads every firearm you own using current ammo reserves
+  - Doom Clock still advances while resting, reinforcing the time pressure loop
 - **Sound effects integration** for weapons, manifestations, and consumables
 - **Typewriter text effects** for immersive storytelling
 
@@ -40,6 +48,9 @@ py -m venv .venv
 python -m pip install --upgrade pip
 pip install pygame rich  # 'rich' is optional but recommended
 
+If running scripts is disabled, run this:
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
 ### Run the game
 From the project root (real terminal recommended):
 ```bash
@@ -51,6 +62,10 @@ python main.py
 Game_project_software1/
 ├─ main.py                       # Entry point with story progression and demo encounters
 ├─ Music/                        # Music & SFX assets (case-sensitive on some systems)
+├─ Database/
+│  ├─ services.py                # Travel, conduit resolution, and arrival/Doom Clock messaging
+│  ├─ menu_ui/                   # Hub loop, travel board, and menu screens
+│  └─ Data/                      # SQL datasets for airports/conduits
 └─ game/
    ├─ __init__.py                # Package API (re-exports: combat, Player, items, enemies, manifestations, music, UI helpers)
    ├─ combat.py                  # Turn-based combat loop and menus (orchestrates actions)
@@ -62,7 +77,10 @@ Game_project_software1/
    ├─ player.py                  # Player class and leveling
    ├─ sfx_loader.py              # Sound effects registration and management
    ├─ story.py                   # Narrative system and story progression logic
-   ├─ ui.py                      # UI helpers: Rich inventory/status bars + ASCII fallbacks
+   ├─ ui.py                      # Rich-first UI orchestration importing shared helpers from `ui_elements/`
+   ├─ ui_elements/
+   │  ├─ ASCII_fallback.py       # Inventory, combat bars, and HUD renderers for non-Rich terminals
+   │  └─ colours.py              # Colour helpers, Rich detection, unified `ui_print`
    └─ writing_effects.py         # Typewriter/glitch/etc. text helpers
 ```
 
@@ -153,6 +171,7 @@ Game_project_software1/
 - File: `game/manifestations.py`
 - Available manifestations: Fear, Hope, Rage, and Resentment (with different costs and effects)
 - SFX field: `sfx_manifest` can be set per manifestation; played when used.
+
 ### Enemies
 - File: `game/enemies.py`
 - Each enemy has a difficulty, HP, attack range, optional special attack, and EXP reward.
@@ -174,11 +193,17 @@ Game_project_software1/
 - Gameplay code triggers sounds via `play_sfx(key)`.
 
 ### Terminal UI (Rich + ASCII fallback)
-- File: `game/ui.py`
-- Inventory and status bars use Rich (tables, colors, “eldritch” themed bars) when available.
-- If `rich` is not installed, both inventory and status bars fall back to ASCII.
-- Includes simple console colouring helpers: `COLOURS` and `colouring(text, colour)`.
- - Standardized printing: use `ui_print(text, colour=None)` everywhere for consistent Rich/ASCII output.
+- Files: `game/ui.py`, `game/ui_elements/ASCII_fallback.py`, `game/ui_elements/colours.py`
+- Inventory renders as dual-pane layout: Rich mode shows Inventory, Vitals, Level, and Doom Clock panels side-by-side; ASCII mode mirrors the original text layout.
+- Shared `ui_print()` automatically routes to Rich or plain ANSI output based on runtime detection (`RICH_AVAILABLE`).
+- Colour helpers (`colouring`, `colorize`) and ASCII HUD/status bars live in the `ui_elements/` package for reuse outside combat.
+
+### Travel & Overworld
+- Files: `Database/menu_ui/menu.py`, `Database/services.py`
+- Hub loop for choosing travel, inventory, or rest; integrates with combat inventory handling.
+- `travel_to_index()` deducts Markka, advances Doom Clock proportional to distance, and prints emphasized arrival/Doom updates.
+- Conduit prompts reward Markka on closure and track global progress to unlock new story beats.
+- `rest()` synchronizes with the active `Player` instance, restoring HP/Sanity and refilling firearm magazines from the player's ammo pools.
 
 ## Demo Flow (`main.py`)
 - Creates a player character with starting manifestations and equipment
@@ -216,7 +241,6 @@ pip install rich
 - Add enemies to `enemy_library` and special attacks as standalone functions
 
 ## Known Ideas / TODO
-- Rest system (recover HP/Sanity between combats)
 - More firearms and ammo types (e.g., shotguns, special rounds)
 - Status effects (poison, bleed, fear) 
 - Save/Load system
@@ -225,12 +249,75 @@ pip install rich
 - critical hits
 - Enemies call for reinforcements mid-fight. (Maybe a specific enemy type)
 - Some cultists summon eldritch horrors if not killed quickly.
-- Boss fights?
+- Boss fights
 - Tension meter (tracking looming horror.(tension meter full maybe a secret boss; 
   looming horror appears) The longer you go without resting, the more “strange events” happen.)
 - A store you can visit to buy items and weapons
 - standardize the UI to use ui_print() 
 - Graceful Defeat handling  (now it just brute forces a sys.exit)
+- Finish fallbacks and safe guards
+
+## Implemented Safeguards and Fallbacks
+This is mainly meant for the teacher to see and review. 
+During this project I tried to learn how to make code robust enough to handle different environments, and to make it as safe as possible.
+
+### Audio System Safeguards
+- **Lazy Audio Initialization**: Pygame mixer is initialized only when first needed, preventing crashes on systems without audio support
+- **Graceful Audio Degradation**: Level-up SFX and music playback include proper checks for mixer initialization
+- **Music State Preservation**: Background music is properly paused during level-up effects and resumed afterward
+- **Silent Audio Failures**: When audio components fail, the game continues without crashing
+
+### UI System Fallbacks
+- **Rich Library Detection**: The `RICH_AVAILABLE` flag safely detects Rich library presence without crashing
+- **Dual Rendering System**:
+  - Rich-enhanced UI for better visual experience when available
+  - ASCII fallback system for terminals without Rich support
+- **Consistent Output**: `ui_print()` function routes output through Rich or ASCII based on availability
+
+### Cross-Platform Compatibility
+- **Terminal Width Detection**: Uses `shutil.get_terminal_size()` with fallback dimensions for different terminal environments
+- **Case-Sensitive Path Handling**: Music assets use case-insensitive loading where possible
+- **Import Error Handling**: Optional dependencies are imported safely with try-except blocks
+
+### Combat & UI Stability
+- **Defensive Programming**: Enemy cleanup and state validation prevent crashes from invalid game states
+- **Input Validation**: Combat actions include bounds checking and error handling
+- **Memory Management**: Proper cleanup of defeated enemies and temporary objects
+- **UI Modularization**: Rich/ASCII presenters are isolated in `game/ui_elements/` to keep fallbacks consistent across menus and combat
+
+## Remaining Work and Future Improvements
+
+**Note**: Due to time constraints in the development cycle, several improvements and safeguards were planned but require completion in future iterations:
+
+### Critical Safeguards Still Needed
+- **Complete Audio Safeguards**: Extend level-up audio protection to all UI audio calls throughout the codebase
+- **Standardize UI Output**: Replace remaining direct `print()` calls with the safe `ui_print()` function
+- **Graceful Defeat Handling**: Replace `sys.exit()` with proper game over screen and restart options
+- **Error Recovery**: Add retry mechanisms for failed audio/music loading
+
+### Planned Features
+- **Save/Load System**: Basic framework exists but needs full implementation and data validation
+- **Rest System**: HP/Sanity recovery mechanics between combats (partially designed)
+- **Status Effects Framework**: Poison, bleed, and fear mechanics (design work done)
+- **Boss Fight System**: Special enemy types and multi-phase encounters
+- **Tension Meter**: Tracks looming horror and triggers secret boss encounters
+- **Audio Glitches**: Randomly trigger audio “glitches” — distorted whispers, reversed sounds, sudden volume spikes.
+- **Critical Hits**: A chance for a critical hit that deals double damage.
+- **Trader/Economy**: A trader that sells items and weapons.
+- **Armor system**: Armor that reduces damage taken. 
+
+### Content Expansion Opportunities
+- **Additional Weapons**: Shotguns, special ammunition types, and exotic weapons
+- **Enemy Variety**: More enemy types with unique abilities and behaviors
+- **Manifestation Balance**: Additional manifestations and rebalancing of existing ones
+- **Narrative Depth**: Expanded story branches and consequence systems
+
+### Technical Debt
+- **Code Standardization**: Migrate remaining modules to use consistent error handling patterns
+- **Testing Coverage**: Add unit tests for critical systems and edge cases
+- **Performance Optimization**: Reduce redundant operations in combat and UI rendering
+- **Documentation Updates**: Keep inline documentation synchronized with implemented features
+
 
 ## Requirements File
 If you prefer a requirements.txt:

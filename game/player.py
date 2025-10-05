@@ -31,6 +31,7 @@ class Player:
         # Ammo pool keyed by ammo type (e.g., 'bullets', 'rifle', 'shells')
         # Example: {'bullets': 12}
         self.ammo = {}
+        self.markka = 0                     # Current currency amount (synced from run state when available)
         self.manifestations = unlocked_manifestations if unlocked_manifestations else []
 
     def attack_range(self):

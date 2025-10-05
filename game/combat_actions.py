@@ -160,7 +160,7 @@ def handle_inventory(player):
                 msgs.append(colouring("You unequip your weapon.", "blue"))
                 msgs.append("")
                 return turn_consumed, msgs
-            else:
+            else: 
                 msgs.append(colouring("You have no weapon equipped!", "yellow"))
                 msgs.append("")
                 return turn_consumed, msgs

@@ -6,26 +6,11 @@ Instructions:
 2. The script sets up the player, prints a short narrative intro, gives starter gear,
    and runs two combat encounters using helpers from the `game/` package.
 """
-# ==========================================
-# TITLE BANNER (VISUAL FLAIR)
-# ==========================================
-#This is our H.P Lovecraft inspired software game project!
-# Fancy ASCII title for the game (just visual flair)
-print("""
- ██▀███   ██▓▄▄▄█████▓▓█████   ██████     ▒█████    █████▒   ▄▄▄█████▓ ██▀███   ▄▄▄       ███▄    █   ██████  ██▓▄▄▄█████▓
-▓██ ▒ ██▒▓██▒▓  ██▒ ▓▒▓█   ▀ ▒██    ▒    ▒██▒  ██▒▓██   ▒    ▓  ██▒ ▓▒▓██ ▒ ██▒▒████▄     ██ ▀█   █ ▒██    ▒ ▓██▒▓  ██▒ ▓▒
-▓██ ░▄█ ▒▒██▒▒ ▓██░ ▒░▒███   ░ ▓██▄      ▒██░  ██▒▒████ ░    ▒ ▓██░ ▒░▓██ ░▄█ ▒▒██  ▀█▄  ▓██  ▀█ ██▒░ ▓██▄   ▒██▒▒ ▓██░ ▒░
-▒██▀▀█▄  ░██░░ ▓██▓ ░ ▒▓█  ▄   ▒   ██▒   ▒██   ██░░▓█▒  ░    ░ ▓██▓ ░ ▒██▀▀█▄  ░██▄▄▄▄██ ▓██▒  ▐▌██▒  ▒   ██▒░██░░ ▓██▓ ░ 
-░██▓ ▒██▒░██░  ▒██▒ ░ ░▒████▒▒██████▒▒   ░ ████▓▒░░▒█░         ▒██▒ ░ ░██▓ ▒██▒ ▓█   ▓██▒▒██░   ▓██░▒██████▒▒░██░  ▒██▒ ░ 
-░ ▒▓ ░▒▓░░▓    ▒ ░░   ░░ ▒░ ░▒ ▒▓▒ ▒ ░   ░ ▒░▒░▒░  ▒ ░         ▒ ░░   ░ ▒▓ ░▒▓░ ▒▒   ▓▒█░░ ▒░   ▒ ▒ ▒ ▒▓▒ ▒ ░░▓    ▒ ░░   
-  ░▒ ░ ▒░ ▒ ░    ░     ░ ░  ░░ ░▒  ░ ░     ░ ▒ ▒░  ░             ░      ░▒ ░ ▒░  ▒   ▒▒ ░░ ░░   ░ ▒░░ ░▒  ░ ░ ▒ ░    ░    
-  ░░   ░  ▒ ░  ░         ░   ░  ░  ░     ░ ░ ░ ▒   ░ ░         ░        ░░   ░   ░   ▒      ░   ░ ░ ░  ░  ░   ▒ ░  ░      
-   ░      ░              ░  ░      ░         ░ ░                         ░           ░  ░         ░       ░   ░           
-
-""")
 
 import shutil
 import pygame
+import sys
+
 
 # ==========================================
 # LOCAL IMPORTS
@@ -38,27 +23,29 @@ from game import (
     add_weapon_to_inventory, add_item_to_inventory,
     play_music, stop_music,
     print_typewriter,
-    ui_print, level_up_display,
+    ui_print, display_hud, LoreItem,
     intro,
     run_story, STORY_MAP, make_choice, wait_for_input
 )
+from Doomclock.doomclock import doom_clock
+from Database.menu_ui.menu import game_loop, main_menu
+from Database.services import start_new_run
 # UI capability flag (for hinting Rich availability to the user)
-from game.music import stop_music
 from game.ui import RICH_AVAILABLE
 # Getting all the sound files from sfx_loader and registering them
 from game.sfx_loader import register_all_sfx
-register_all_sfx()
 
-print("Manifestations available:", list(manifestation_library.keys()))
+#print("Manifestations available:", list(manifestation_library.keys()))
 
-if __name__ == "__main__":
+def start_story():
     # ==========================================
     # PLAYER SETUP
     # ==========================================
     # Create our player character.
     unlocked_manifestations = []
     player = Player("Hero", unlocked_manifestations)
-
+    # Attach DoomClock to player for easy access
+    player.doom_clock = doom_clock
     # Determine terminal width for nicer wrapping (fallback to 80)
     term_width = shutil.get_terminal_size(fallback=(80, 20)).columns
     wrap_width = max(50, min(100, term_width))
@@ -69,14 +56,15 @@ if __name__ == "__main__":
     else:
         print("\nRich UI enabled. Enjoy enhanced inventory and status visuals.\n")
 
-
-
     # ==========================================
     # NARRATIVE 
     # ==========================================
     add_weapon_to_inventory(player, "AR-15", current_mag=13)
+    add_weapon_to_inventory(player, "MP7", current_mag=14)
     add_weapon_to_inventory(player, "Basic dagger")
     add_item_to_inventory(player, "rifle ammo", 10)   
+    add_item_to_inventory(player, "submachine ammo", 54)
+    add_item_to_inventory(player, "pistol ammo", 13)
     play_music("Music/ambience/Piano_suspense.mp3", volume=0.12, loop=True)
 
     # ==========================================
@@ -84,53 +72,80 @@ if __name__ == "__main__":
     # ==========================================
     player.manifestations.append(manifestation_library["Fear"])
     intro()
+    state = start_new_run()
+    player.markka = getattr(state, "markka", 0)
+
+    display_hud(player, doom_clock)
     player.gain_exp(50)
     stop_music()
-    
-    # ==========================================
-    # CONDUIT 2
-    # ==========================================
-    run_story("2_conduit", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
+
+    def play_chapter_two():
+        run_story("2_conduit", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
     # Here we can give rewards afther the combat encounter
 
-    run_story("2_conduit.aftermath", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
-    # Here we should add the manifestation unlocked here
-    player.manifestations.append(manifestation_library["Hope"])
+        run_story("2_conduit.aftermath", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
+        player.manifestations.append(manifestation_library["Hope"])
 
-    # ==========================================
-    # CONDUIT 3
-    # ==========================================
-    run_story("3_conduit", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
+    def play_chapter_three():
+        run_story("3_conduit", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
     #Here we can give combat rewards
 
-    run_story("3_first_encounter.aftermath", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
+        run_story("3_first_encounter.aftermath", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
     #Here we should add the manifestation unlocked here
-    player.manifestations.append(manifestation_library["Resentment"])
+        player.manifestations.append(manifestation_library["Resentment"])
 
-    run_story("defiance_anatomist.combat", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
+        run_story("defiance_anatomist.combat", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
     # Here we can give rewards the story cuts after the bossfight and below it continues after it 
 
-    run_story("anatomist.aftermath", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
+        run_story("anatomist.aftermath", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
 
-    # ==========================================    
-    # CONDUIT 4
-    # ==========================================    
-    run_story("4_conduit", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
+    def play_chapter_four():
+        run_story("4_conduit", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
     #Here we can give combat rewards
 
-    run_story("4_conduit.encounter", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
+        run_story("4_conduit.encounter", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
     # Here we should add the manifestation unlocked here
-    player.manifestations.append(manifestation_library["Rage"])
+        player.manifestations.append(manifestation_library["Rage"])
 
-    run_story("4_conduit.defy", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
+        run_story("4_conduit.defy", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
     # Here we can give rewards the story cuts after the bossfight and below it continues after it 
 
-    run_story("4_conduit.aftermath", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
-    
-    # ==========================================
-    # CONDUIT 5
-    # ==========================================
-    run_story("5_conduit", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
+        run_story("4_conduit.aftermath", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
+
+    def play_chapter_five():
+        run_story("5_conduit", player, STORY_MAP, print_typewriter, wait_for_input, make_choice)
+
+    chapter_scripts = [
+        (1, play_chapter_two),
+        (2, play_chapter_three),
+        (3, play_chapter_four),
+        (4, play_chapter_five),
+    ]
+
+    next_chapter_index = 0
+
+    while True:
+        event = game_loop(player, state)
+        if event is None:
+            continue
+        if event.event_type == "quit":
+            return
+
+        while next_chapter_index < len(chapter_scripts):
+            required_conduits, chapter_fn = chapter_scripts[next_chapter_index]
+            if state.conduits_found >= required_conduits:
+                chapter_fn()
+                next_chapter_index += 1
+            else:
+                break
+
+
+
+if __name__ == "__main__":
+    register_all_sfx()
+    main_menu(start_story)
+    sys.exit(0)
+
 
     
 
