@@ -35,12 +35,6 @@ def make_choice(options):
             return int(choice)
         print("Invalid choice. Try again.")
 
-# Player Stats
-#player = {
-#    "sanity": 100,
-#    "power": 0
-#}
-
 # Story Functions
 def intro():
     slow_print("""=== Chapter I: Crimson Veil ===\n
@@ -245,12 +239,6 @@ def combat_scene():
     add_weapon_to_inventory(tutorial_player, "Basic dagger")
     add_item_to_inventory(tutorial_player, "Small Health Potion")
 
-    # Gentle atmosphere for tutorial
-    try:
-        play_music("Music/combat/Training.mp3", volume=0.10)
-    except Exception:
-        # If the track is missing, it's fine to continue silently
-        pass
     slow_print("""    Ezekiel: \"First, equip a weapon from your inventory.\"
     \"Then try a simple Attack. Choose a target and strike.\"
     \"You can also Defend to halve the next hit, or open Inventory to use a potion.\"

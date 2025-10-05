@@ -142,6 +142,7 @@ def start_story():
 
 
 if __name__ == "__main__":
+    play_music("Music/ambience/Whispers_Beyond_the_Veil.mp3", volume=0.12, loop=True)
     register_all_sfx()
     main_menu(start_story)
     sys.exit(0)

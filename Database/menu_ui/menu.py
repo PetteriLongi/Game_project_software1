@@ -3,6 +3,7 @@ from Database.config import RunState
 from Database.services import travel_to_index, rest
 from Database.services import TravelResult
 from Database.menu_ui.travel_board import show_travel_options
+from game.music import play_music
 from game.ui import colouring, ui_print
 from Database.FetchDB import coords, distance_km
 from rich.console import Console
@@ -19,6 +20,7 @@ console = Console()
 
 
 def show_commands():
+    play_music("Music/ambience/Whispers_Beyond_the_Veil.mp3", volume=0.12, loop=True)
     ui_print("Choose: [1] Travel  [2] Inventory  [3] Rest  [H] Help  [Q] Quit", "bold cyan")
 
 def show_help():
