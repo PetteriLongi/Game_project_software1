@@ -1,42 +1,16 @@
-"""
-music.py - Simple music and SFX helpers for the game
+"""Music and SFX helpers with seamless track transitions.
 
-INSTRUCTIONS:
---------------
-1. Import this module in your main game file:
-       from game import music
+Highlights:
+    • Mixer is initialised lazily on first use (`play_music()` or friends).
+    • `play_music()` keeps the current track alive unless a new file is requested,
+      fading out the previous loop and fading in the replacement.
+    • `stop_music()` clears the cached track so future calls can restart it.
+    • Load short sound effects with `load_sfx()` and play them through
+      `play_sfx()` (optionally pinning them to reserved channels).
+    • Volume helpers exist for both music (`set_volume`) and cached SFX
+      (`set_sfx_volume`).
 
-2. To play a music track (lazy-inits the mixer on first use):
-       music.play_music("path/to/your/music_file.mp3", volume=0.5)
-   - 'volume' is optional and ranges from 0.0 (silent) to 1.0 (max volume).
-
-3. To explicitly initialize audio (optional):
-       music.init_audio()
-   - Useful to handle/diagnose audio init errors early.
-
-4. To stop the music:
-       music.stop_music()
-
-5. To change volume while playing:
-       music.set_volume(0.3)
-
-6. To load a sound effect (SFX):
-       music.load_sfx("my_sfx", "path/to/your/sfx_file.wav", volume=0.3, channel_id=0)
-   - 'volume' is optional and ranges from 0.0 (silent) to 1.0 (max volume).
-   - 'channel_id' is optional and reserves a mixer channel for the SFX.
-
-7. To play a loaded SFX:
-       music.play_sfx("my_sfx", channel_id=0)
-
-8. To adjust volume for a loaded SFX:
-       music.set_sfx_volume("my_sfx", 0.5)
-
-9. To unload a loaded SFX:
-       music.unload_sfx("my_sfx")
-
-Notes:
-- The mixer is lazily initialized on first use to avoid import-time side effects.
-- If initialization fails (e.g., missing audio device), functions will no-op gracefully.
+All helpers degrade gracefully when audio cannot be initialised (e.g. no device).
 """
 
 import pygame
