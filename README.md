@@ -1,7 +1,83 @@
+Lovecraft-inspired, terminal-based, turn-based RPG (Python)
 
-Lovecraft-inspired, terminal-based, turn-based RPG written in Python.
 Battle cultists and abominations using melee weapons, firearms with magazines and ammo reserves, and eldritch manifestations that consume Sanity.
 
+**Database prerequisite (MariaDB)**
+
+This game requires a local MariaDB database for the travel/airport/conduit data.
+You’ll install MariaDB, create a schema, import the dataset, and set credentials the game will use.
+
+Database Setup (MariaDB) — Required
+**1) Install MariaDB and a GUI client**
+
+MariaDB Server (local) – default port 3306
+https://mariadb.org/download/
+
+HeidiSQL (Windows GUI) – optional but recommended
+https://www.heidisql.com/download.php
+
+You can use any MySQL/MariaDB client; HeidiSQL instructions are below.
+
+2) Create a database & user (with HeidiSQL)
+
+Open HeidiSQL → create a New session → host: 127.0.0.1, user: your root user (or an admin), connect.
+
+Right-click the server → Create new → Database…
+
+Name it (e.g.) flightgame
+
+Collation: utf8mb4_general_ci (or utf8mb4_0900_ai_ci if available)
+
+With the server selected, open Users tab → Add:
+
+User: conduit_user
+
+Host: localhost
+
+Password: set a password (e.g. conduit_pass)
+
+Database-specific privileges: grant ALL on flightgame (or at least SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX)
+
+Save.
+
+**3) Import the dataset**
+
+In the repo you’ll find something like Data/flightgame.sql (or similarly named SQL dump).
+
+In HeidiSQL: select the flightgame database → File → Run SQL file… → pick the .sql → Execute.
+
+You should now see tables populated (airports, conduits, etc.).
+
+**4) Tell the game how to connect**
+The game reads DB credentials from config constants (these are typical, adjust to your tree):
+conduit_game/utils/config.py
+
+**Set the following constants to match your local setup:**
+
+DB_USER = "conduit_user"
+DB_PASSWORD = "conduit_pass"
+DB_HOST = "127.0.0.1"
+DB_PORT = 3306
+DB_NAME = "flightgame"
+
+**The code uses mariadb:**
+pip install mariadb
+
+If you hit build errors on Windows, install the MariaDB Connector/C from MariaDB’s site, then retry pip install mariadb.
+
+Troubleshooting
+
+Access denied: confirm user, password, host = localhost, and that you granted the privileges on flightgame.
+
+Can’t connect: ensure MariaDB service is running; confirm port 3306 isn’t in use; check firewall.
+
+Unicode issues: ensure DB and tables use utf8mb4 collations.
+
+Driver missing: install mariadb (or switch code to mysql-connector-python and install that).
+
+------------------------------------------------------------------------------------------------------------------------
+
+The game reads DB credentials from config constants (these are typical, adjust to your tree):
 ## Features
 - **Narrative-driven gameplay** with chapter-based story progression and player choices
 - Turn-based combat with a clear, colorized combat log
