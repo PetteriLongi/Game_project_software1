@@ -160,35 +160,6 @@ Game_project_software1/
    └─ writing_effects.py         # Typewriter/glitch/etc. text helpers
 ```
 
-## Conventions
-- **[imports]**
-  - Non-optional imports go at the top of the file (e.g., `random`, `pygame`, `time`).
-  - Optional Rich imports are wrapped in a try/except in `game/ui.py` and gated by `RICH_AVAILABLE`.
-  - Use lazy imports inside functions to avoid circulars when needed (e.g., `from .ui import level_up_display` in `Player.gain_exp()`).
-- **[printing]**
-  - Use `ui_print(text, colour=None)` from `game/ui.py` for all user-facing messages (it routes to Rich or ASCII automatically).
-  - Prefer passing simple colour names/styles (e.g., `"green"`, `"blue"`, `"bold magenta"`).
-- **[SFX]**
-  - Register all SFX in `game/sfx_loader.py` via `register_all_sfx()` called from `main.py`.
-  - Reference SFX by keys in code using `play_sfx(key)`.
-  - Entity fields:
-    - `Consumable.sfx_name` (e.g., Eating/Drinking) plays on use.
-    - `Weapon.sfx_attack` and `Weapon.sfx_reload` play during attack/reload resolution (not on construction).
-    - `Manifestation.sfx_manifest` plays when used.
-- **[inventory rules]**
-  - Ammo consumables are routed to `player.ammo` by display name (must match `Weapon.ammo_type`).
-  - Stacking compares by display name (e.g., `"Small coffee"`) so metadata like SFX is preserved.
-- **[combat loop]**
-  - Enemy cleanup (removal of defeated) happens at the start of each new player turn to keep `[ DEFEATED ]` visible for the remainder of the round.
-- **[naming]**
-  - Use `snake_case` for variables/functions, `PascalCase` for classes.
-  - Prefer consistent lower_snake_case for SFX keys.
-- **[constants/config]**
-  - Keep tuning knobs (level-up gains, EXP scaling, volumes) near their usage or extract to module-level constants for clarity.
-- **[assets]**
-  - Paths under `Music/` are case-sensitive on some systems; keep filenames consistent with loader entries.
-  - Ensure you have rights to any assets you add.
-
 ## Core Systems
 ### Player
 - Class: `game/player.py` -> `Player`
