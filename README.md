@@ -117,7 +117,7 @@ Driver missing: install mariadb (or switch code to mysql-connector-python and in
 
 Install dependencies:
 ```bash
-pip install pygame rich
+pip install pygame rich geopy
 ```
 
 py -m venv .venv
