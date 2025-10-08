@@ -372,6 +372,7 @@ If you prefer a requirements.txt:
 ```
 pygame>=2.0.0
 rich>=13.0.0
+geopy>=2.4.1
 ```
 
 ## Credits
