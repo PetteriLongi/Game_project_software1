@@ -77,7 +77,7 @@ Driver missing: install mariadb (or switch code to mysql-connector-python and in
 
 ------------------------------------------------------------------------------------------------------------------------
 
-The game reads DB credentials from config constants (these are typical, adjust to your tree):
+
 ## Features
 - **Narrative-driven gameplay** with chapter-based story progression and player choices
 - Turn-based combat with a clear, colorized combat log
