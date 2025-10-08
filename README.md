@@ -1,6 +1,7 @@
 Lovecraft-inspired, terminal-based, turn-based RPG (Python)
 
-Battle cultists and abominations using melee weapons, firearms with magazines and ammo reserves, and eldritch manifestations that consume Sanity.
+Battle cultists and abominations using melee weapons, firearms with magazines and ammo reserves, and eldritch manifestations that consume Sanity. 
+Travel around the world with a enviromentally friendly Electric airplane!
 
 **Database prerequisite (MariaDB)**
 
